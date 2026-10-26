@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadline Auto-Generation Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .demo-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+        .frequency-selector { margin: 15px 0; }
+        select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin: 10px 0; }
+        .deadline-container { margin: 15px 0; }
+        .flex { display: flex; gap: 10px; align-items: center; margin: 10px 0; }
+        input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; font-size: 14px; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 15px 0; }
+        .result { background: #f0f8ff; padding: 15px; border-radius: 4px; margin: 15px 0; }
+        h1, h2 { color: #333; }
+        .highlight { background: #fff3cd; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>📅 Deadline Auto-Generation Demo</h1>
+    
+    <div class="instructions">
+        <h3>📋 How it works:</h3>
+        <ol>
+            <li>Select a frequency (Monthly, Quarterly, or Annual)</li>
+            <li>Enter the <strong>first non-N/A</strong> due date manually</li>
+            <li>The system will automatically generate all subsequent due dates for <strong>empty fields only</strong></li>
+            <li>Weekend dates are automatically adjusted to Monday</li>
+            <li><strong>Auto-generated dates are fully editable!</strong> Change them as needed</li>
+        </ol>
+        
+        <h3>🎯 Example:</h3>
+        <p>If you select <span class="highlight">Quarterly</span> and enter <span class="highlight">May 9, 2026</span>, the system will generate:</p>
+        <ul>
+            <li>May 9, 2026 (your input)</li>
+            <li>August 9, 2026 (+3 months) - <em>auto-generated, editable</em></li>
+            <li>November 9, 2026 (+6 months) - <em>auto-generated, editable</em></li>
+            <li>February 9, 2027 (+9 months) - <em>auto-generated, editable</em></li>
+        </ul>
+        
+        <h3>✨ New Behavior:</h3>
+        <ul>
+            <li><strong>First non-N/A date</strong> triggers auto-generation</li>
+            <li><strong>Only empty fields</strong> get auto-generated</li>
+            <li><strong>Manual changes</strong> to auto-generated dates are preserved</li>
+            <li><strong>N/A checkboxes</strong> work independently</li>
+        </ul>
+    </div>
+    
+    <div class="demo-section">
+        <h2>🔧 Try it yourself:</h2>
+        
+        <div class="frequency-selector">
+            <label for="frequency"><strong>Frequency:</strong></label>
+            <select id="frequency" onchange="generateDeadlinesDemo()">
+                <option value="monthly">Monthly</option>
+                <option value="quarterly" selected>Quarterly</option>
+                <option value="annual">Annual</option>
+            </select>
+        </div>
+        
+        <div id="deadlineContainer" class="deadline-container"></div>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>✅ Auto-generated dates:</h3>
+            <div id="resultText"></div>
+        </div>
+    </div>
+
+    <script>
+        // Copy the functions from the main application
+        function adjustWeekend(date) {
+            const day = date.getDay();
+            if (day === 6) { // Saturday
+                date.setDate(date.getDate() + 2); // Move to Monday
+            } else if (day === 0) { // Sunday
+                date.setDate(date.getDate() + 1); // Move to Monday
+            }
+            return date;
+        }
+        
+        function generateSubsequentDates(firstDate, frequency, count, startIndex = 0) {
+            const dates = [];
+            const startDate = new Date(firstDate);
+            
+            for (let i = 0; i < count; i++) {
+                const date = new Date(startDate);
+                
+                if (frequency === 'monthly') {
+                    date.setMonth(startDate.getMonth() + (i - startIndex));
+                } else if (frequency === 'quarterly') {
+                    date.setMonth(startDate.getMonth() + ((i - startIndex) * 3));
+                } else if (frequency === 'annual') {
+                    date.setFullYear(startDate.getFullYear() + (i - startIndex));
+                }
+                
+                dates.push(adjustWeekend(date));
+            }
+            
+            return dates;
+        }
+        
+        let pickers = [];
+        let isFirstDateSet = false;
+        
+        function generateDeadlinesDemo() {
+            const frequency = document.getElementById('frequency').value;
+            const container = document.getElementById('deadlineContainer');
+            const count = frequency === 'monthly' ? 12 : (frequency === 'quarterly' ? 4 : 1);
+            
+            container.innerHTML = '';
+            pickers = [];
+            isFirstDateSet = false;
+            document.getElementById('result').style.display = 'none';
+            
+            for (let i = 0; i < count; i++) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "flex gap-2 items-center mb-2";
+                
+                const label = document.createElement("div");
+                label.style.minWidth = "120px";
+                label.style.fontWeight = "bold";
+                label.textContent = i === 0 ? "📝 First date:" : `📅 Date ${i + 1}:`;
+                
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Select date";
+                input.dataset.index = i;
+                input.className = "flex-1 border border-gray-300 rounded-lg px-4 py-2";
+                
+                // Add N/A checkbox
+                const naCheckbox = document.createElement("input");
+                naCheckbox.type = "checkbox";
+                naCheckbox.id = `na_${i}`;
+                naCheckbox.style.marginLeft = "10px";
+                
+                const naLabel = document.createElement("label");
+                naLabel.htmlFor = `na_${i}`;
+                naLabel.textContent = "N/A";
+                naLabel.style.fontSize = "12px";
+                naLabel.style.cursor = "pointer";
+                
+                wrapper.appendChild(label);
+                wrapper.appendChild(input);
+                wrapper.appendChild(naCheckbox);
+                wrapper.appendChild(naLabel);
+                container.appendChild(wrapper);
+                
+                let picker = null;
+                
+                function initDatePicker() {
+                    picker = flatpickr(input, {
+                        altInput: true, 
+                        altFormat: "F j, Y", 
+                        dateFormat: "Y-m-d",
+                        minDate: i === 0 ? "today" : null,
+                        onChange: function (selectedDates) {
+                            if (!selectedDates.length) return;
+                            const selected = selectedDates[0];
+                            
+                            // Auto-generate subsequent dates if this is the first date
+                            if (i === 0 && !isFirstDateSet) {
+                                isFirstDateSet = true;
+                                const subsequentDates = generateSubsequentDates(selected, frequency, count);
+                                
+                                // Show results
+                                const resultDiv = document.getElementById('result');
+                                const resultText = document.getElementById('resultText');
+                                let html = '<ul>';
+                                
+                                for (let j = 0; j < count; j++) {
+                                    html += `<li><strong>Date ${j + 1}:</strong> ${subsequentDates[j].toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    })}</li>`;
+                                    
+                                    // Set dates for subsequent inputs
+                                    if (j > 0 && pickers[j]) {
+                                        setTimeout(() => {
+                                            pickers[j].setDate(subsequentDates[j]);
+                                        }, 100);
+                                    }
+                                }
+                                
+                                html += '</ul>';
+                                resultText.innerHTML = html;
+                                resultDiv.style.display = 'block';
+                            }
+                        }
+                    });
+                    pickers[i] = picker;
+                }
+                
+                initDatePicker();
+            }
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            generateDeadlinesDemo();
+        };
+    </script>
+</body>
+</html>

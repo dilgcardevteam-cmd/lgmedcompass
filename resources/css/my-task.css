@@ -1,0 +1,3072 @@
+/* ============================================
+   GLOBAL & RESET
+   ============================================ */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+header {
+    background: #ffffffff;
+}
+
+/* ============================================
+   MAIN CONTAINER & PAGE STRUCTURE
+   ============================================ */
+.page-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.doc-page {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    margin: 20px auto 20px auto;
+    outline: 1px solid #c5c5c5ff;
+}
+
+/* ============================================
+   DOCUMENT CARDS (GRID & CARD STYLES)
+   ============================================ */
+.doc-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.doc-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    transition: 0.25s ease;
+    cursor: pointer;
+}
+
+.doc-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.doc-field {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.label {
+    color: #888;
+    margin-right: 5px;
+}
+
+.value {
+    font-weight: 500;
+}
+
+/* Card header */
+.doc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.doc-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.doc-open-icon {
+    background: #f1f1f1;
+    padding: 6px;
+    border-radius: 8px;
+}
+
+/* Progress bar inside cards */
+.progress-wrapper {
+    margin: 10px 0 15px 0;
+}
+
+.progress-bar-card {
+    width: 100%;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill-card {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.6s ease;
+}
+
+.progress-text {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #666;
+}
+
+/* Status badges */
+.badge-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: #e6f6ed;
+    color: #2e7d32;
+}
+
+.badge-warning {
+    background: #fff5e6;
+    color: #b26a00;
+}
+
+.badge-danger {
+    background: #fdecea;
+    color: #c62828;
+}
+
+/* Sheet indicator (hover tooltip) */
+.sheet-indicator:hover .sheet-breakdown,
+.sheet-breakdown:hover {
+    display: block !important;
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.sheet-breakdown {
+    white-space: nowrap;
+    background: white;
+}
+
+.sheet-breakdown div {
+    padding: 2px 0;
+    font-size: 10px;
+}
+
+/* ============================================
+   ACTION BUTTONS (card actions)
+   ============================================ */
+.card-actions {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    border: none;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 13px;
+}
+
+.edit-btn {
+    background: #28c76f;
+    color: white;
+}
+
+.archive-btn {
+    background: #f6cc74;
+    color: #000;
+}
+
+.delete-btn {
+    background: #ff5b5b;
+    color: #fff;
+}
+
+/* ============================================
+   SEARCH & ACTIONS ROW
+   ============================================ */
+.doc-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-row input {
+    padding: 8px 15px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    width: 260px;
+    transition: 0.3s;
+    height: 42px;
+}
+
+.search-row input:focus {
+    border-color: #f6cc74;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(246, 204, 116, 0.2);
+}
+
+.btn-outline {
+    border: 1px solid #8c8c8cff;
+    padding: 6px 16px;
+    border-radius: 25px;
+    background: rgb(189, 81, 81);
+    transition: 0.2s;
+}
+
+.btn-outline:hover {
+    background: #f2f2f2;
+}
+
+.btn-warning {
+    background: #f6cc74 !important;
+    border: none !important;
+}
+
+/* ============================================
+   TABLE VIEW (alternative layout)
+   ============================================ */
+.doc-table {
+    margin-top: 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.doc-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.doc-table thead {
+    background: #f6cc74;
+}
+
+.doc-table th {
+    padding: 14px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.doc-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.doc-table tbody tr {
+    transition: 0.2s;
+}
+
+.doc-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Table row grid system */
+:root {
+    --doc-grid: 2.5fr 1fr 1fr 1fr 1fr;
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns: var(--doc-grid);
+    align-items: center;
+}
+
+.table-header {
+    background: #f6cc74;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+.table-row {
+    margin-top: 12px;
+    background: #f9f9f9;
+    padding: 16px 18px;
+    border-radius: 16px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+    transition: background 0.2s ease;
+}
+
+.table-row:hover {
+    background: #fafafa;
+}
+
+.table-row.clickable-row {
+    cursor: pointer;
+}
+
+.subject-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.subject-title {
+    font-weight: bold;
+    font-size: 18px;
+    align-self: flex-start;
+}
+
+.subject-focal {
+    font-size: 14px;
+    align-self: flex-start;
+    color: #6c757d;
+}
+
+/* Progress bar in table */
+.progress-bar-wrapper {
+    width: 80%;
+    height: 15px;
+    background: #fcf1db;
+    border-radius: 20px;
+    overflow: hidden;
+    pointer-events: none;
+    margin: 0 auto;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #f6cc74;
+    border-radius: 20px;
+    transition: width 0.6s ease;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Status cell & dropdown */
+.status-cell {
+    display: flex;
+    justify-content: center;
+}
+
+.status-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    min-width: 120px;
+    padding: 6px 34px 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 8l4 4 4-4' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.status-todo { background-color: #B9BFCA; }
+.status-progress { background-color: #7BA4E8; }
+.status-review { background-color: #F9BD56; color: #000; }
+.status-revision { background-color: #FF875C; }
+.status-done { background-color: #6BBF8A; }
+.status-incomplete { background-color: #A78BFA; }
+
+.status-select:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.status-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+}
+
+/* Actions inside table */
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.actions button {
+    border: none;
+    padding: 3px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #f6cc74;
+}
+
+.actions .edit {
+    background: #28c76f;
+    color: #fff;
+}
+
+.actions .edit:hover {
+    background: #22b464;
+}
+
+.actions .delete {
+    background: #ff5b5b;
+    color: #fff;
+}
+
+.actions .delete-archive {
+    background: #f6cc74;
+    color: #fff;
+}
+
+/* ============================================
+   ATTACHMENTS & FILES
+   ============================================ */
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f9f9f9;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.attachment-item span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+
+.attachment-item .bi-download {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.attachment-item .bi-download:hover {
+    opacity: 1;
+    color: #0d6efd !important;
+}
+
+.no-attachment {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* File upload fake input */
+.file-input-wrapper {
+    position: relative;
+}
+
+.real-file-input {
+    display: none;
+}
+
+.fake-file-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background: #fff;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.file-placeholder {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #555;
+}
+
+.file-pill {
+    background: #f1f3f5;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    text-decoration: none;
+    color: #333;
+}
+
+.file-pill:hover {
+    background: #e9ecef;
+}
+
+.choose-btn {
+    background: #f6cc74;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* ============================================
+   UPLOAD MODAL (REDESIGNED HEADER)
+   ============================================ */
+/* Modal backdrop */
+.modal-backdrop {
+    z-index: 1040;
+}
+
+/* Upload modal specific */
+#uploadModal .modal-content {
+    border-radius: 20px;
+}
+
+#uploadModal .modal-body {
+    padding: 30px 40px;
+}
+
+/* 🔥 NEW UPLOAD MODAL HEADER STYLES 🔥 */
+#uploadModal .modal-header {
+    background: linear-gradient(135deg, #fef9e6 0%, #fff9ed 100%);
+    border-bottom: 1px solid #ffe6b3;
+    padding: 1.25rem 1.5rem;
+}
+
+#uploadModal .modal-header .upload-icon {
+    background: linear-gradient(145deg, #eab308, #ca8a04);
+    box-shadow: 0 8px 14px -6px rgba(234, 179, 8, 0.25);
+}
+
+#uploadModal .modal-header h5 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+#uploadModal .modal-header p {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a16207;
+}
+
+/* Drop zone inside upload modal */
+.border-dashed {
+    background: #fafafa;
+    transition: 0.3s;
+}
+
+.border-dashed:hover {
+    background: #f9f3e6;
+}
+
+#uploadDropZone {
+    transition: all 0.2s ease;
+}
+
+#uploadDropZone.drag-over {
+    border-color: #eab308 !important;
+    background-color: #fefce8 !important;
+    transform: scale(0.99);
+}
+
+/* ============================================
+   WORKFLOW MODAL
+   ============================================ */
+.modal-content {
+    border-radius: 20px;
+}
+
+.modal-body label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+    border-radius: 25px;
+    padding: 10px 18px;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+}
+
+.modal-body input:focus,
+.modal-body select:focus,
+.modal-body textarea:focus {
+    border-color: #f6cc74;
+    box-shadow: 0 0 0 3px rgba(246, 204, 116, 0.2);
+    outline: none;
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+.custom-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.page-number {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111;
+    padding: 8px 12px;
+    transition: 0.2s;
+}
+
+.page-number:hover {
+    color: #000;
+}
+
+.page-number.active {
+    background: #f6cc74;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-custom .pagination {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-custom .page-item .page-link {
+    border-radius: 50rem !important;
+    border: none;
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    margin: 0 0.125rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination-custom .page-item .page-link:hover {
+    background-color: #e5e7eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.pagination-custom .page-item.active .page-link {
+    background-color: #f59e0b;
+    color: white;
+    box-shadow: 0 4px 8px rgba(245,158,11,0.3);
+}
+
+/* ============================================
+   CHECKBOXES & MISC
+   ============================================ */
+.round-checkbox {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.round-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.round-checkbox span {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #bdbdbd;
+    border-radius: 45%;
+    display: inline-block;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.round-checkbox input:checked + span {
+    background-color: #f6cc74;
+    border-color: #f6cc74;
+}
+
+.round-checkbox span::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 45%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s ease;
+}
+
+.round-checkbox input:checked + span::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes loading-progress {
+    0% { left: -30%; }
+    100% { left: 100%; }
+}
+
+@keyframes task-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(3.05); }
+    100% { transform: scale(5); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast container */
+#toastContainer {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    z-index: 99999 !important;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (max-width: 1200px) {
+    .doc-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .doc-page {
+        width: 95%;
+        padding: 20px;
+    }
+    .doc-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .table-header,
+    .table-row {
+        grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+        font-size: 14px;
+    }
+    .progress-bar-wrapper {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .doc-page {
+        width: 100%;
+        padding: 15px;
+        margin-top: 10px;
+    }
+    .doc-card-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .card-actions {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin-top: 12px;
+        justify-content: flex-end;
+    }
+    .doc-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .search-row {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+    .search-row input {
+        width: 100%;
+    }
+    .progress-bar-wrapper {
+        width: 100%;
+    }
+    .table-header {
+        display: none;
+    }
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 16px;
+    }
+    .subject-column {
+        background: #fff;
+        padding: 12px;
+        border-radius: 12px;
+    }
+    .status-cell {
+        justify-content: flex-start;
+    }
+    .actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .doc-title {
+        font-size: 15px;
+    }
+    .doc-field {
+        font-size: 13px;
+    }
+    .progress-text {
+        font-size: 11px;
+    }
+    .page-number {
+        font-size: 14px;
+    }
+    .workflow-trigger {
+        white-space: normal;
+        word-break: break-word;
+        font-size: 0.7rem !important;
+        padding: 0.5rem 0.25rem !important;
+    }
+    .download-btn,
+    .delete-trigger {
+        padding: 0.5rem !important;
+        min-width: 36px;
+        min-height: 36px;
+    }
+    #uploadModal .modal-body {
+        padding: 1rem;
+    }
+}
+
+/* Landscape mode */
+@media (max-width: 896px) and (orientation: landscape) {
+    .doc-page {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    .doc-card-grid {
+        gap: 0.75rem;
+    }
+    .fixed.inset-0 {
+        padding-top: 0.5rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .fixed.inset-0,
+    .workflow-trigger,
+    .download-btn,
+    .delete-trigger,
+    #openUploadModalBtn,
+    .tab-btn,
+    .close-modal,
+    nav[role="navigation"] {
+        display: none !important;
+    }
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    .doc-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+}
+
+/* Accessibility & scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+*:focus-visible {
+    outline: 2px solid #eab308;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #E5E7EB;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #D1D5DB;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Tooltips */
+.edit-trigger,
+.delete-trigger,
+.doc-open-btn,
+.download-btn,
+.workflow-trigger,
+.archive-btn,
+.upload-btn {
+    position: relative;
+}
+
+.edit-trigger[data-tooltip]:hover::after,
+.delete-trigger[data-tooltip]:hover::after,
+.doc-open-btn[data-tooltip]:hover::after,
+.download-btn[data-tooltip]:hover::after,
+.workflow-trigger[data-tooltip]:hover::after,
+.archive-btn[data-tooltip]:hover::after,
+.upload-btn[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    background: #0f172a;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1600;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+/* Updated Active Tab Styles */
+.active-tab {
+    position: relative;
+    background-color: #ffffff !important;
+    /* Remove default button borders that might interfere */
+    border-bottom: none !important; 
+}
+
+.active-tab::after {
+    content: "";
+    position: absolute;
+    /* Pull the bar down slightly to overlap the parent border perfectly */
+    bottom: -1px; 
+    /* Center the bar and give it a slight margin so it looks cleaner with rounded corners */
+    left: 10%;
+    right: 10%;
+    height: 4px;
+    background-color: #eab308; /* Default Yellow */
+    border-radius: 20px 20px 0 0;
+    z-index: 30;
+}
+
+/* Specific color for the Task tab indicator */
+#taskTabBtn.active-tab::after {
+    background-color: #6366f1; /* Indigo */
+}
+
+/* Fix for the parent container to ensure the active tab looks connected */
+.active-tab::before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: white;
+    z-index: 25;
+}
+
+
+/* Custom responsive styles for Document Process page */
+
+/* Mobile-first adjustments */
+@media (max-width: 640px) {
+  /* Modals full width on small screens */
+  .fixed.inset-0 > .relative {
+    max-width: 95% !important;
+    margin: 1rem auto !important;
+  }
+
+  /* Card adjustments */
+  .doc-card {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  /* Tab buttons compact */
+  .tab-btn {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .tab-btn i:first-child {
+    font-size: 1rem !important;
+  }
+
+  /* Form inputs full width */
+  .grid form input, 
+  .grid form select, 
+  .grid form textarea {
+    font-size: 16px !important; /* prevents zoom on iOS */
+  }
+
+  /* Drop zone text size */
+  #uploadDropZone p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Better touch targets for buttons */
+button, 
+.workflow-trigger, 
+.approve-trigger, 
+.ready-to-print-trigger,
+.download-btn,
+.delete-trigger {
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  button, 
+  .workflow-trigger, 
+  .approve-trigger, 
+  .ready-to-print-trigger,
+  .download-btn,
+  .delete-trigger {
+    min-height: 48px;
+  }
+}
+
+/* Scrollbar styling (already present) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #E5E7EB;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #D1D5DB;
+}
+
+/* Drag and drop highlight */
+.drag-over {
+  border-color: #eab308 !important;
+  background-color: #fefce8 !important;
+  transition: all 0.2s ease;
+}
+
+/* Toast container responsive */
+#toastContainer {
+  bottom: 1rem;
+  right: 1rem;
+  left: auto;
+  width: auto;
+  max-width: calc(100% - 2rem);
+}
+
+@media (max-width: 640px) {
+  #toastContainer {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+  #toastContainer > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Ensure modal content doesn't overflow on small screens */
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* File list grid responsive */
+#fileList, #editFileList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  #fileList, #editFileList {
+    grid-template-columns: 1fr;
+  }
+}
+/* ============================================
+   GLOBAL & RESET
+   ============================================ */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+header {
+    background: #ffffffff;
+}
+
+/* ============================================
+   MAIN CONTAINER & PAGE STRUCTURE
+   ============================================ */
+.page-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.doc-page {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    margin: 20px auto 20px auto;
+    outline: 1px solid #c5c5c5ff;
+}
+
+/* ============================================
+   DOCUMENT CARDS (GRID & CARD STYLES)
+   ============================================ */
+.doc-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.doc-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    transition: 0.25s ease;
+    cursor: pointer;
+}
+
+.doc-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.doc-field {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.label {
+    color: #888;
+    margin-right: 5px;
+}
+
+.value {
+    font-weight: 500;
+}
+
+/* Card header */
+.doc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.doc-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.doc-open-icon {
+    background: #f1f1f1;
+    padding: 6px;
+    border-radius: 8px;
+}
+
+/* Progress bar inside cards */
+.progress-wrapper {
+    margin: 10px 0 15px 0;
+}
+
+.progress-bar-card {
+    width: 100%;
+    height: 8px;
+    background: #f1f1f1;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill-card {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.6s ease;
+}
+
+.progress-text {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #666;
+}
+
+/* Status badges */
+.badge-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: #e6f6ed;
+    color: #2e7d32;
+}
+
+.badge-warning {
+    background: #fff5e6;
+    color: #b26a00;
+}
+
+.badge-danger {
+    background: #fdecea;
+    color: #c62828;
+}
+
+/* Sheet indicator (hover tooltip) */
+.sheet-indicator:hover .sheet-breakdown,
+.sheet-breakdown:hover {
+    display: block !important;
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.sheet-breakdown {
+    white-space: nowrap;
+    background: white;
+}
+
+.sheet-breakdown div {
+    padding: 2px 0;
+    font-size: 10px;
+}
+
+/* ============================================
+   ACTION BUTTONS (card actions)
+   ============================================ */
+.card-actions {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    border: none;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 13px;
+}
+
+.edit-btn {
+    background: #28c76f;
+    color: white;
+}
+
+.archive-btn {
+    background: #f6cc74;
+    color: #000;
+}
+
+.delete-btn {
+    background: #ff5b5b;
+    color: #fff;
+}
+
+/* ============================================
+   SEARCH & ACTIONS ROW
+   ============================================ */
+.doc-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-row input {
+    padding: 8px 15px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    width: 260px;
+    transition: 0.3s;
+    height: 42px;
+}
+
+.search-row input:focus {
+    border-color: #f6cc74;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(246, 204, 116, 0.2);
+}
+
+.btn-outline {
+    border: 1px solid #8c8c8cff;
+    padding: 6px 16px;
+    border-radius: 25px;
+    background: rgb(189, 81, 81);
+    transition: 0.2s;
+}
+
+.btn-outline:hover {
+    background: #f2f2f2;
+}
+
+.btn-warning {
+    background: #f6cc74 !important;
+    border: none !important;
+}
+
+/* ============================================
+   TABLE VIEW (alternative layout)
+   ============================================ */
+.doc-table {
+    margin-top: 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.doc-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.doc-table thead {
+    background: #f6cc74;
+}
+
+.doc-table th {
+    padding: 14px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.doc-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.doc-table tbody tr {
+    transition: 0.2s;
+}
+
+.doc-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Table row grid system */
+:root {
+    --doc-grid: 2.5fr 1fr 1fr 1fr 1fr;
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns: var(--doc-grid);
+    align-items: center;
+}
+
+.table-header {
+    background: #f6cc74;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+.table-row {
+    margin-top: 12px;
+    background: #f9f9f9;
+    padding: 16px 18px;
+    border-radius: 16px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+    transition: background 0.2s ease;
+}
+
+.table-row:hover {
+    background: #fafafa;
+}
+
+.table-row.clickable-row {
+    cursor: pointer;
+}
+
+.subject-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.subject-title {
+    font-weight: bold;
+    font-size: 18px;
+    align-self: flex-start;
+}
+
+.subject-focal {
+    font-size: 14px;
+    align-self: flex-start;
+    color: #6c757d;
+}
+
+/* Progress bar in table */
+.progress-bar-wrapper {
+    width: 80%;
+    height: 15px;
+    background: #fcf1db;
+    border-radius: 20px;
+    overflow: hidden;
+    pointer-events: none;
+    margin: 0 auto;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: #f6cc74;
+    border-radius: 20px;
+    transition: width 0.6s ease;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Status cell & dropdown */
+.status-cell {
+    display: flex;
+    justify-content: center;
+}
+
+.status-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    min-width: 120px;
+    padding: 6px 34px 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 8l4 4 4-4' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.status-todo { background-color: #B9BFCA; }
+.status-progress { background-color: #7BA4E8; }
+.status-review { background-color: #F9BD56; color: #000; }
+.status-revision { background-color: #FF875C; }
+.status-done { background-color: #6BBF8A; }
+.status-incomplete { background-color: #A78BFA; }
+
+.status-select:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.status-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+}
+
+/* Actions inside table */
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.actions button {
+    border: none;
+    padding: 3px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #f6cc74;
+}
+
+.actions .edit {
+    background: #28c76f;
+    color: #fff;
+}
+
+.actions .edit:hover {
+    background: #22b464;
+}
+
+.actions .delete {
+    background: #ff5b5b;
+    color: #fff;
+}
+
+.actions .delete-archive {
+    background: #f6cc74;
+    color: #fff;
+}
+
+/* ============================================
+   ATTACHMENTS & FILES
+   ============================================ */
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f9f9f9;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.attachment-item span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+
+.attachment-item .bi-download {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.attachment-item .bi-download:hover {
+    opacity: 1;
+    color: #0d6efd !important;
+}
+
+.no-attachment {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* File upload fake input */
+.file-input-wrapper {
+    position: relative;
+}
+
+.real-file-input {
+    display: none;
+}
+
+.fake-file-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background: #fff;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.file-placeholder {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #555;
+}
+
+.file-pill {
+    background: #f1f3f5;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    text-decoration: none;
+    color: #333;
+}
+
+.file-pill:hover {
+    background: #e9ecef;
+}
+
+.choose-btn {
+    background: #f6cc74;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* ============================================
+   UPLOAD MODAL (REDESIGNED HEADER)
+   ============================================ */
+/* Modal backdrop */
+.modal-backdrop {
+    z-index: 1040;
+}
+
+/* Upload modal specific */
+#uploadModal .modal-content {
+    border-radius: 20px;
+}
+
+#uploadModal .modal-body {
+    padding: 30px 40px;
+}
+
+/* 🔥 NEW UPLOAD MODAL HEADER STYLES 🔥 */
+#uploadModal .modal-header {
+    background: linear-gradient(135deg, #fef9e6 0%, #fff9ed 100%);
+    border-bottom: 1px solid #ffe6b3;
+    padding: 1.25rem 1.5rem;
+}
+
+#uploadModal .modal-header .upload-icon {
+    background: linear-gradient(145deg, #eab308, #ca8a04);
+    box-shadow: 0 8px 14px -6px rgba(234, 179, 8, 0.25);
+}
+
+#uploadModal .modal-header h5 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+#uploadModal .modal-header p {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a16207;
+}
+
+/* Drop zone inside upload modal */
+.border-dashed {
+    background: #fafafa;
+    transition: 0.3s;
+}
+
+.border-dashed:hover {
+    background: #f9f3e6;
+}
+
+#uploadDropZone {
+    transition: all 0.2s ease;
+}
+
+#uploadDropZone.drag-over {
+    border-color: #eab308 !important;
+    background-color: #fefce8 !important;
+    transform: scale(0.99);
+}
+
+/* ============================================
+   WORKFLOW MODAL
+   ============================================ */
+.modal-content {
+    border-radius: 20px;
+}
+
+.modal-body label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+    border-radius: 25px;
+    padding: 10px 18px;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+}
+
+.modal-body input:focus,
+.modal-body select:focus,
+.modal-body textarea:focus {
+    border-color: #f6cc74;
+    box-shadow: 0 0 0 3px rgba(246, 204, 116, 0.2);
+    outline: none;
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+.custom-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.page-number {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111;
+    padding: 8px 12px;
+    transition: 0.2s;
+}
+
+.page-number:hover {
+    color: #000;
+}
+
+.page-number.active {
+    background: #f6cc74;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-custom .pagination {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-custom .page-item .page-link {
+    border-radius: 50rem !important;
+    border: none;
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    margin: 0 0.125rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination-custom .page-item .page-link:hover {
+    background-color: #e5e7eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.pagination-custom .page-item.active .page-link {
+    background-color: #f59e0b;
+    color: white;
+    box-shadow: 0 4px 8px rgba(245,158,11,0.3);
+}
+
+/* ============================================
+   CHECKBOXES & MISC
+   ============================================ */
+.round-checkbox {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.round-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.round-checkbox span {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #bdbdbd;
+    border-radius: 45%;
+    display: inline-block;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.round-checkbox input:checked + span {
+    background-color: #f6cc74;
+    border-color: #f6cc74;
+}
+
+.round-checkbox span::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 45%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s ease;
+}
+
+.round-checkbox input:checked + span::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes loading-progress {
+    0% { left: -30%; }
+    100% { left: 100%; }
+}
+
+@keyframes task-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(3.05); }
+    100% { transform: scale(5); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast container */
+#toastContainer {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    z-index: 99999 !important;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (max-width: 1200px) {
+    .doc-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .doc-page {
+        width: 95%;
+        padding: 20px;
+    }
+    .doc-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .table-header,
+    .table-row {
+        grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+        font-size: 14px;
+    }
+    .progress-bar-wrapper {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .doc-page {
+        width: 100%;
+        padding: 15px;
+        margin-top: 10px;
+    }
+    .doc-card-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .card-actions {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin-top: 12px;
+        justify-content: flex-end;
+    }
+    .doc-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .search-row {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+    .search-row input {
+        width: 100%;
+    }
+    .progress-bar-wrapper {
+        width: 100%;
+    }
+    .table-header {
+        display: none;
+    }
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 16px;
+    }
+    .subject-column {
+        background: #fff;
+        padding: 12px;
+        border-radius: 12px;
+    }
+    .status-cell {
+        justify-content: flex-start;
+    }
+    .actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .doc-title {
+        font-size: 15px;
+    }
+    .doc-field {
+        font-size: 13px;
+    }
+    .progress-text {
+        font-size: 11px;
+    }
+    .page-number {
+        font-size: 14px;
+    }
+    .workflow-trigger {
+        white-space: normal;
+        word-break: break-word;
+        font-size: 0.7rem !important;
+        padding: 0.5rem 0.25rem !important;
+    }
+    .download-btn,
+    .delete-trigger {
+        padding: 0.5rem !important;
+        min-width: 36px;
+        min-height: 36px;
+    }
+    #uploadModal .modal-body {
+        padding: 1rem;
+    }
+}
+
+/* Landscape mode */
+@media (max-width: 896px) and (orientation: landscape) {
+    .doc-page {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    .doc-card-grid {
+        gap: 0.75rem;
+    }
+    .fixed.inset-0 {
+        padding-top: 0.5rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .fixed.inset-0,
+    .workflow-trigger,
+    .download-btn,
+    .delete-trigger,
+    #openUploadModalBtn,
+    .tab-btn,
+    .close-modal,
+    nav[role="navigation"] {
+        display: none !important;
+    }
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    .doc-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+}
+
+/* Accessibility & scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+*:focus-visible {
+    outline: 2px solid #eab308;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #E5E7EB;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #D1D5DB;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Tooltips */
+.edit-trigger,
+.delete-trigger,
+.doc-open-btn,
+.download-btn,
+.workflow-trigger,
+.archive-btn,
+.upload-btn {
+    position: relative;
+}
+
+.edit-trigger[data-tooltip]:hover::after,
+.delete-trigger[data-tooltip]:hover::after,
+.doc-open-btn[data-tooltip]:hover::after,
+.download-btn[data-tooltip]:hover::after,
+.workflow-trigger[data-tooltip]:hover::after,
+.archive-btn[data-tooltip]:hover::after,
+.upload-btn[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    background: #0f172a;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1600;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+/* Updated Active Tab Styles */
+.active-tab {
+    position: relative;
+    background-color: #ffffff !important;
+    /* Remove default button borders that might interfere */
+    border-bottom: none !important; 
+}
+
+.active-tab::after {
+    content: "";
+    position: absolute;
+    /* Pull the bar down slightly to overlap the parent border perfectly */
+    bottom: -1px; 
+    /* Center the bar and give it a slight margin so it looks cleaner with rounded corners */
+    left: 10%;
+    right: 10%;
+    height: 4px;
+    background-color: #eab308; /* Default Yellow */
+    border-radius: 20px 20px 0 0;
+    z-index: 30;
+}
+
+/* Specific color for the Task tab indicator */
+#taskTabBtn.active-tab::after {
+    background-color: #6366f1; /* Indigo */
+}
+
+/* Fix for the parent container to ensure the active tab looks connected */
+.active-tab::before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: white;
+    z-index: 25;
+}
+
+
+/* Custom responsive styles for Document Process page */
+
+/* Mobile-first adjustments */
+@media (max-width: 640px) {
+  /* Modals full width on small screens */
+  .fixed.inset-0 > .relative {
+    max-width: 95% !important;
+    margin: 1rem auto !important;
+  }
+
+  /* Card adjustments */
+  .doc-card {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  /* Tab buttons compact */
+  .tab-btn {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .tab-btn i:first-child {
+    font-size: 1rem !important;
+  }
+
+  /* Form inputs full width */
+  .grid form input, 
+  .grid form select, 
+  .grid form textarea {
+    font-size: 16px !important; /* prevents zoom on iOS */
+  }
+
+  /* Drop zone text size */
+  #uploadDropZone p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Better touch targets for buttons */
+button, 
+.workflow-trigger, 
+.approve-trigger, 
+.ready-to-print-trigger,
+.download-btn,
+.delete-trigger {
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  button, 
+  .workflow-trigger, 
+  .approve-trigger, 
+  .ready-to-print-trigger,
+  .download-btn,
+  .delete-trigger {
+    min-height: 48px;
+  }
+}
+
+/* Scrollbar styling (already present) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #E5E7EB;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #D1D5DB;
+}
+
+/* Drag and drop highlight */
+.drag-over {
+  border-color: #eab308 !important;
+  background-color: #fefce8 !important;
+  transition: all 0.2s ease;
+}
+
+/* Toast container responsive */
+#toastContainer {
+  bottom: 1rem;
+  right: 1rem;
+  left: auto;
+  width: auto;
+  max-width: calc(100% - 2rem);
+}
+
+@media (max-width: 640px) {
+  #toastContainer {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+  #toastContainer > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Ensure modal content doesn't overflow on small screens */
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* File list grid responsive */
+#fileList, #editFileList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  #fileList, #editFileList {
+    grid-template-columns: 1fr;
+  }
+}
+/* ============================================
+   ENHANCED MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Dropdown width fixes for all screen sizes */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem !important;
+    min-width: 140px; /* Ensure minimum width for longest options */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Ensure dropdown text doesn't get cut off */
+select option {
+    white-space: nowrap;
+    padding: 8px 12px;
+    max-width: none; /* Allow full width for options */
+}
+
+/* Line clamp for text truncation */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Mobile-first improvements */
+@media (max-width: 640px) {
+    /* Header section */
+    .py-6 {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    /* Search form improvements */
+    .bg-gray-50\/80 {
+        background-color: rgba(249, 250, 251, 0.95);
+    }
+    
+    /* Filter dropdown improvements */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem !important;
+        min-width: 140px; /* Ensure minimum width for longest options */
+        width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    
+    /* Ensure dropdown text doesn't get cut off */
+    select option {
+        white-space: nowrap;
+        padding: 8px 12px;
+        max-width: none; /* Allow full width for options */
+    }
+    
+    /* Action buttons improvements */
+.workflow-trigger, .approve-trigger, .ready-to-print-trigger {
+    min-height: 44px;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
+}
+
+.workflow-trigger span, .approve-trigger span, .ready-to-print-trigger span {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Download and delete buttons */
+.download-btn, .delete-trigger {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+}
+
+/* Button improvements */
+    button, .btn {
+        min-height: 44px;
+        font-size: 16px !important; /* Prevents iOS zoom */
+        touch-action: manipulation;
+    }
+    
+    /* Document cards */
+    .doc-card {
+        margin-bottom: 1rem;
+    }
+    
+    .doc-card:hover {
+        transform: translateY(-8px);
+        outline: orange
+    }
+    
+    /* Tab improvements */
+    .tab-btn {
+        min-height: 48px;
+        touch-action: manipulation;
+    }
+    
+    /* Input and select improvements */
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents iOS zoom */
+        min-height: 44px;
+    }
+    
+    /* Modal improvements */
+    .fixed.inset-0 > .relative {
+        max-width: 95vw !important;
+        max-height: 90vh !important;
+        margin: 5vh auto;
+        overflow-y: auto;
+    }
+    
+    /* Toast improvements */
+    #toastContainer {
+        position: fixed;
+        bottom: 1rem;
+        left: 1rem;
+        right: 1rem;
+        max-width: none;
+        z-index: 99999;
+    }
+    
+    #toastContainer .toast-item {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Small mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+    /* Grid adjustments */
+    .grid.grid-cols-1.sm\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Text sizes */
+    .text-2xl {
+        font-size: 1.5rem;
+    }
+    
+    .text-xl {
+        font-size: 1.25rem;
+    }
+    
+    /* Spacing adjustments */
+    .gap-4 {
+        gap: 1rem;
+    }
+    
+    .p-4 {
+        padding: 1rem;
+    }
+    
+    /* Button full width on very small screens */
+    .sm\:w-auto {
+        width: 100% !important;
+    }
+    
+    /* Action buttons on very small screens */
+    .workflow-trigger, .approve-trigger, .ready-to-print-trigger {
+        font-size: 11px !important;
+        padding: 8px 10px !important;
+        min-height: 40px;
+    }
+    
+    .workflow-trigger i, .approve-trigger i, .ready-to-print-trigger i {
+        font-size: 12px !important;
+    }
+    
+    .download-btn, .delete-trigger {
+        padding: 8px !important;
+        min-height: 40px;
+        min-width: 40px;
+    }
+    
+    .download-btn i, .delete-trigger i {
+        font-size: 14px !important;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .py-6 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .doc-card {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .doc-card:hover {
+        transform: none;
+    }
+    
+    .doc-card:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    .tab-btn:hover {
+        transform: none;
+    }
+    
+    .tab-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* ============================================
+   GLOBAL RESPONSIVE OVERRIDES
+   ============================================ */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* ============================================
+   HEADER & TOP ACTIONS (Archive/Upload/Search)
+   ============================================ */
+.doc-actions {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping on small screens */
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.search-row {
+    display: flex;
+    flex: 1 1 300px; /* Takes space but allows shrinking */
+    min-width: 250px;
+}
+
+.search-row input {
+    width: 100% !important;
+    height: 42px;
+}
+
+.action-buttons-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+@media (max-width: 768px) {
+    .doc-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-row {
+        order: 2; /* Put search below buttons on mobile if desired */
+        width: 100%;
+    }
+
+    .action-buttons-group {
+        order: 1;
+        justify-content: space-between;
+    }
+
+    .btn-outline, .btn-warning {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* ============================================
+   TABS RESPONSIVENESS (Uploaded vs Tasks)
+   ============================================ */
+.flex.items-end.w-full.max-w-2xl {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 8px;
+    padding: 0 5px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.tab-btn {
+    flex: 1; /* Force tabs to share 50/50 space */
+    min-width: 0; /* Prevents text from forcing width */
+    padding: 12px 8px !important;
+    display: flex;
+    flex-direction: row !important; /* Keep icon and text side-by-side */
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 12px 12px 0 0 !important;
+    transition: all 0.2s ease;
+}
+
+/* Hide secondary labels on very small screens to prevent overlap */
+@media (max-width: 540px) {
+    .tab-btn .flex-col span:first-child {
+        display: none; /* Hides "STORAGE" / "ACTION" labels */
+    }
+    
+    .tab-btn b, .tab-btn .text-lg {
+        font-size: 14px;
+    }
+
+    .tab-btn i {
+        font-size: 1.2rem;
+    }
+}
+
+/* ============================================
+   EMPTY STATE & DROPZONE
+   ============================================ */
+#uploadDropZone {
+    width: 100%;
+    margin: 20px 0;
+    padding: 40px 20px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #d1d5db;
+    border-radius: 16px;
+    background: #f9fafb;
+}
+
+#uploadDropZone p {
+    max-width: 80%;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    color: #6b7280;
+}
+
+/* ============================================
+   DOCUMENT CARDS GRID
+   ============================================ */
+.doc-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .doc-card-grid {
+        grid-template-columns: 1fr; /* Stack cards on mobile */
+    }
+    
+    .doc-page {
+        width: 100%;
+        padding: 15px;
+        margin: 0;
+        border-radius: 0;
+        outline: none;
+    }
+}
+
+/* ============================================
+   TOUCH TARGETS & FORM INPUTS
+   ============================================ */
+button, 
+.workflow-trigger, 
+.tab-btn,
+select,
+input {
+    min-height: 44px; /* Standard for mobile touch */
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+}
+
+/* Toast responsiveness */
+#toastContainer {
+    width: auto;
+    max-width: calc(100% - 2rem);
+    left: 1rem;
+    right: 1rem;
+}
+
+/* ============================================
+   MOBILE & TABLET RESPONSIVE STYLES
+   ============================================ */
+
+/* Mobile phones (≤640px) */
+@media (max-width: 640px) {
+    .page-container {
+        padding: 1rem;
+    }
+    
+    /* Header section */
+    .relative.overflow-hidden.bg-white {
+        padding: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .absolute.top-0.right-0 {
+        width: 8rem !important;
+        height: 8rem !important;
+        margin-right: -2rem !important;
+        margin-top: -2rem !important;
+    }
+    
+    .absolute.bottom-0.left-0 {
+        width: 8rem !important;
+        height: 8rem !important;
+        margin-left: -2rem !important;
+        margin-bottom: -2rem !important;
+    }
+    
+    /* Typography */
+    h2.text-4xl {
+        font-size: 2rem !important;
+    }
+    
+    p.text-lg {
+        font-size: 1rem !important;
+    }
+    
+    /* Search and filters */
+    .flex.flex-wrap.items-center.gap-3 {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+    
+    .relative.group input {
+        width: 100% !important;
+    }
+    
+    select {
+        width: 100% !important;
+    }
+    
+    /* Action buttons */
+    .flex.items-center.gap-3 {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem !important;
+    }
+    
+    .flex-1.md\:flex-none {
+        flex: none !important;
+        width: 100%;
+    }
+    
+    /* Tabs */
+    .flex.items-end.w-full {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+    
+    .tab-btn {
+        padding: 0.75rem 1rem !important;
+        font-size: 0.875rem !important;
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+    }
+    
+    /* Hide scrollbars completely */
+    .flex.items-end.w-full::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    .flex.items-end.w-full {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+    
+    /* Also hide scrollbars on any tab container */
+    .tabs-container::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    .tabs-container {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+    
+    /* Document cards */
+    .grid.grid-cols-1 {
+        gap: 1rem !important;
+    }
+    
+    .doc-card {
+        padding: 1rem !important;
+    }
+    
+    .doc-card h3 {
+        font-size: 1.125rem !important;
+    }
+    
+    .doc-card .space-y-3 {
+        gap: 0.75rem !important;
+    }
+    
+    .doc-card .flex.items-center.gap-3 {
+        gap: 0.75rem !important;
+    }
+    
+    .doc-card .w-8.h-8 {
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+    
+    /* Action buttons in cards */
+    .flex.flex-wrap.gap-2 {
+        flex-direction: column;
+        gap: 0.75rem !important;
+    }
+    
+    .flex-1 button {
+        width: 100%;
+    }
+    
+    /* Modals */
+    .fixed.inset-0 .bg-white {
+        margin: 1rem;
+        border-radius: 1rem !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* Tablets (641px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .page-container {
+        padding: 1.5rem;
+    }
+    
+    /* Header section */
+    .relative.overflow-hidden.bg-white {
+        padding: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    .absolute.top-0.right-0 {
+        width: 10rem !important;
+        height: 10rem !important;
+        margin-right: -2.5rem !important;
+        margin-top: -2.5rem !important;
+    }
+    
+    .absolute.bottom-0.left-0 {
+        width: 10rem !important;
+        height: 10rem !important;
+        margin-left: -2.5rem !important;
+        margin-bottom: -2.5rem !important;
+    }
+    
+    /* Typography */
+    h2.text-4xl {
+        font-size: 2.5rem !important;
+    }
+    
+    /* Search and filters */
+    .flex.flex-wrap.items-center.gap-3 {
+        gap: 1rem !important;
+    }
+    
+    .relative.group input {
+        width: 12rem !important;
+    }
+    
+    select {
+        width: 10rem !important;
+    }
+    
+    /* Tabs */
+    .tab-btn {
+        padding: 0.875rem 1.25rem !important;
+        font-size: 0.9375rem !important;
+    }
+    
+    /* Document cards */
+    .grid.grid-cols-1.md\:grid-cols-2 {
+        gap: 1.5rem !important;
+    }
+    
+    .doc-card {
+        padding: 1.5rem !important;
+    }
+    
+    .doc-card h3 {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Action buttons in cards */
+    .flex.flex-wrap.gap-2 {
+        gap: 0.875rem !important;
+    }
+}
+
+/* ============================================
+   TABS RESPONSIVE STYLES
+   ============================================ */
+.tabs-container {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 32rem;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+    border-bottom: 1px solid rgba(229, 231, 255, 0.6);
+    gap: 0.25rem;
+}
+
+.tab-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    padding: 0.625rem 1rem 0.875rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    border-radius: 1rem 1rem 0 0;
+    z-index: 20;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.tab-btn:hover {
+    transform: translateY(-1px);
+}
+
+.tab-btn.active-tab {
+    background: white;
+    color: #1f2937;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:not(.active-tab) {
+    color: #9ca3af;
+}
+
+.tab-btn:not(.active-tab):hover {
+    color: #6b7280;
+    background: rgba(249, 250, 251, 0.5);
+}
+
+/* Mobile responsive tabs */
+@media (max-width: 640px) {
+    .tabs-container {
+        gap: 0.125rem;
+        padding: 0 0.25rem;
+    }
+    
+    .tab-btn {
+        padding: 0.5rem 0.75rem 0.75rem;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+    
+    .tab-btn .tab-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .tab-btn .tab-badge {
+        margin-left: 0.25rem;
+        padding: 0.125rem 0.375rem;
+        font-size: 0.5625rem;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 475px) {
+    .tabs-container {
+        padding: 0 0.125rem;
+        gap: 0.0625rem;
+    }
+    
+    .tab-btn {
+        padding: 0.375rem 0.5rem 0.625rem;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .tab-btn .tab-subtitle {
+        display: none;
+    }
+    
+    .tab-btn .tab-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    
+    .tab-btn .tab-badge {
+        margin-left: 0.125rem;
+        padding: 0.0625rem 0.25rem;
+        font-size: 0.5rem;
+    }
+}
+
+/* ============================================
+   ERROR MESSAGE STYLING - FIXED POSITION
+   ============================================ */
+#uploadModalError {
+    position: fixed !important;
+    top: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    min-width: 300px !important;
+    max-width: 500px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+    border-radius: 12px !important;
+    animation: none !important;
+    margin: 0 !important;
+    transition: opacity 0.5s ease-out !important;
+}
+
+#uploadModalError.fade-out {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

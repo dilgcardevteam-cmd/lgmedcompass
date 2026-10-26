@@ -1,0 +1,330 @@
+.icon-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    color: #f59e0b;
+    pointer-events: none;
+}
+
+.textarea-icon {
+    top: 14px;
+}
+
+.with-icon {
+    padding-left: 40px !important;
+}
+
+.success-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #22c55e;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 30000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.calendar-modal-date-group.hidden {
+    display: none;
+}
+
+.calendar-modal {
+    position: fixed;
+    inset: 0;   
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.calendar-modal.hidden {
+    display: none;
+}
+
+.calendar-modal-overlay {   
+    position: fixed;   /* change from fixed */
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 0;
+}
+
+.calendar-modal-card {
+    position: relative;
+    z-index: 1; /* ABOVE overlay */
+
+    width: min(680px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.2);
+
+    padding: 28px 30px;
+}
+
+.calendar-date,
+.calendar-time {
+    padding: 12px 18px;
+    border-radius: 30px;
+    border: none;
+    background: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    width: 100%;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14);    
+}
+
+.date-range-wrapper,
+.date-time-wrapper {
+    display: flex;
+    gap: 16px;
+}
+
+.hidden {
+    display: none;
+}
+
+.calendar-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.calendar-modal-title {
+    margin: 0;
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.calendar-modal-close-btn {
+    border: 0;
+    background: transparent;
+    color: #525252;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.calendar-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.calendar-modal-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.calendar-modal-row-top {
+    align-items: flex-start;
+}
+
+.calendar-modal-icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    color: #e4a63b;
+}
+
+.calendar-modal-icon-offset {
+    margin-top: 14px;
+}
+
+.calendar-modal-input,
+.calendar-modal-textarea {
+    width: 100%;
+    border: 0;
+    border-radius: 20px;
+    color: #111111;
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14);
+    outline: none;
+}
+
+.calendar-modal-input::placeholder,
+.calendar-modal-textarea::placeholder {
+    color: #878787;
+}
+
+.calendar-modal-input:focus,
+.calendar-modal-textarea:focus {
+    box-shadow: 0 0 0 2px rgba(228, 166, 59, 0.45), 0 3px 8px rgba(0, 0, 0, 0.14);
+}
+
+.calendar-modal-textarea {
+    min-height: 120px;
+    resize: none;
+    border-radius: 16px;
+}
+
+.calendar-modal-date-group-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.calendar-modal-date-group {
+    display: flex;
+    gap: 14px;
+}
+
+.calendar-modal-time-group {
+    align-items: center;
+}
+
+.calendar-modal-time-input {
+    width: 172px;
+    min-width: 172px;
+    text-align: center;
+}
+
+.calendar-modal-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 6px;
+}
+
+.calendar-modal-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #e4a63b;
+    cursor: pointer;
+}
+
+.calendar-modal-checkbox-label {
+    font-size: 15px;
+    color: #2a2a2a;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.calendar-modal-submit-btn {
+    width: 180px;
+    height: 56px;
+    border: 0;
+    border-radius: 9999px;
+    background: #2e2929;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 4px auto 0;
+    cursor: pointer;
+}
+
+@media (max-width: 1200px) {
+    .calendar-modal-title {
+        font-size: 34px;
+    }
+
+    .calendar-modal-input,
+    .calendar-modal-textarea,
+    .calendar-modal-checkbox-label,
+    .calendar-modal-submit-btn {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-modal {
+        padding: 66px 10px 10px;
+    }
+
+    .calendar-modal-card,
+    body.sidebar-open .calendar-modal-card {
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 76px);
+        border-radius: 14px;
+        padding: 20px 14px;
+    }
+
+    .calendar-modal-header {
+        margin-bottom: 18px;
+    }
+
+    .calendar-modal-title {
+        font-size: 30px;
+    }
+
+    .calendar-modal-form {
+        gap: 14px;
+    }
+
+    .calendar-modal-row {
+        gap: 10px;
+    }
+
+    .calendar-modal-icon {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+    }
+
+    .calendar-modal-icon-offset {
+        margin-top: 10px;
+    }
+
+    .calendar-modal-date-group,
+    .calendar-modal-time-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .calendar-modal-time-input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .calendar-modal-input,
+    .calendar-modal-textarea {
+        font-size: 15px;
+        border-radius: 14px;
+        padding: 12px 14px;
+    }
+
+    .calendar-modal-checkbox-label {
+        font-size: 14px;
+    }
+
+    .calendar-modal-submit-btn {
+        width: 100%;
+        height: 48px;
+        font-size: 14px;
+    }
+    
+    .input-error {
+        border: 1px solid #e53935 !important;
+    }
+
+    .error-text {
+        font-size: 12px;
+        color: #e53935;
+        margin-top: 4px;
+    }
+}
