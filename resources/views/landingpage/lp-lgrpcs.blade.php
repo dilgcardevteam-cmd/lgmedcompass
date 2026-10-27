@@ -135,9 +135,82 @@
     .report-tile h4 {
         font-size: 18px;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin: 0 0 12px;
         line-height: 1.4;
         color: #0f172a;
+    }
+
+    .report-tile summary {
+        list-style: none;
+    }
+
+    .report-tile summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .project-summary {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .project-hint {
+        margin-top: 4px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .project-details {
+        display: none;
+        width: 100%;
+        padding-top: 18px;
+        border-top: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .report-tile:hover .project-details,
+    .report-tile:focus-within .project-details,
+    .report-tile[open] .project-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .project-details p {
+        margin: 0;
+    }
+
+    .project-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .project-link:hover {
+        background: var(--accent);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .project-link:focus-visible,
+    .project-summary:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 4px;
     }
 
     .focal-badge {
@@ -213,146 +286,48 @@
         </div>
 
         <div class="modern-grid">
+            @php
+                $projects = [
+                    'Barangay Assembly',
+                    'Barangay at Kalinisan Day (BarKaDa)',
+                    'Barangay FDP',
+                    'Barangay Road Clearing Operations (BaRCO)',
+                    'CPD-led Programs (Family/RPRH, Population)',
+                    'DA-led',
+                    'Election-Related Concerns (non-legal matters)',
+                    'Full Disclosure Policy (FDP)',
+                    "Halina't magtanim ng Prutas at Gulay (HAPAG)",
+                    'IPMR (Indigenous Peoples Mandatory Representation)',
+                    'Kalinisan sa Bagong Pilipinas Reports',
+                    'Labor & Employment Compliance (DOLE-led)',
+                    'LG Month Celebration',
+                    'LGU Annual Report',
+                    'LGU Celebrations',
+                    'LGU Leagues (Election/Meetings)',
+                    'NCIP-led Activities',
+                    'SK Full Public Disclosure Policy (FPDP)',
+                    'SK, NYC and Youth Related PPAs',
+                    'Social Protection & Vulnerable Sectors (DSWD-led)',
+                ];
+            @endphp
 
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Barangay Assembly</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Barangay at Kalinisan Day (BarKaDa)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Barangay FDP</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Barangay Road Clearing Operations (BaRCO)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>CPD-led Programs (Family/RPRH, Population)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>DA-led</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Election-Related Concerns (non-legal matters)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Full Disclosure Policy (FDP)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Halina't magtanim ng Prutas at Gulay (HAPAG)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>IPMR (Indigenous Peoples Mandatory Representation)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Kalinisan sa Bagong Pilipinas Reports</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Labor & Employment Compliance (DOLE-led)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>LG Month Celebration</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>LGU Annual Report</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>LGU Celebrations</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>LGU Leagues (Election/Meetings)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>NCIP-led Activities</h4>
-            </div>
-            
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>SK Full Public Disclosure Policy (FPDP)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>SK, NYC and Youth Related PPAs</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Social Protection & Vulnerable Sectors (DSWD-led)</h4>
-            </div>
+            @foreach($projects as $project)
+                <details class="report-tile" name="ppa-projects">
+                    <summary class="project-summary">
+                        <span class="tile-logo-wrapper">
+                            <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
+                        </span>
+                        <h4>{{ $project }}</h4>
+                        <span class="project-hint">View project details</span>
+                    </summary>
+                    <div class="project-details">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <a class="project-link" href="https://drive.google.com/" target="_blank" rel="noopener noreferrer">
+                            Open project link <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </details>
+            @endforeach
         </div>
     </div>
 </main>

@@ -135,9 +135,82 @@
     .report-tile h4 {
         font-size: 18px;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin: 0 0 12px;
         line-height: 1.4;
         color: #0f172a;
+    }
+
+    .report-tile summary {
+        list-style: none;
+    }
+
+    .report-tile summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .project-summary {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .project-hint {
+        margin-top: 4px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .project-details {
+        display: none;
+        width: 100%;
+        padding-top: 18px;
+        border-top: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .report-tile:hover .project-details,
+    .report-tile:focus-within .project-details,
+    .report-tile[open] .project-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .project-details p {
+        margin: 0;
+    }
+
+    .project-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .project-link:hover {
+        background: var(--accent);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .project-link:focus-visible,
+    .project-summary:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 4px;
     }
 
     .focal-badge {
@@ -213,98 +286,41 @@
         </div>
 
         <div class="modern-grid">
+            @php
+                $projects = [
+                    'Anti-Drug Abuse Councils (ADAC) Functionality Audit',
+                    'Cockpit and Cockfighting Monitoring',
+                    'Comprehensive Social Benefits Program (CSBP)',
+                    'Enhanced Comprehensive Local Integration Program (ECLIP)',
+                    'Human Rights Action Center (HRAC)',
+                    'Katarungang Pambarangay (KP)',
+                    'Local Legislative Awards (LLA)',
+                    'NTF/RTF ELCAC related activities',
+                    'Philippine Anti-Drugs Strategy (PADS)-related PPAS',
+                    'POGO Report',
+                    'Preventing and Countering Violent Extremism and Insurgency (PCVE)',
+                    'Regional Adjudication Committee (RAC)',
+                    'Regional Peace and Order Council (RPOC)',
+                ];
+            @endphp
 
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Anti-Drug Abuse Councils (ADAC) Functionality Audit</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Cockpit and Cockfighting Monitoring</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Comprehensive Social Benefits Program (CSBP)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Enhanced Comprehensive Local Integration Program (ECLIP)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Human Rights Action Center (HRAC)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Katarungang Pambarangay (KP)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Local Legislative Awards (LLA)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>NTF/RTF ELCAC related activities</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Philippine Anti-Drugs Strategy (PADS)-related PPAS</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>POGO Report</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Preventing and Countering Violent Extremism and Insurgency (PCVE)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Regional Adjudication Committee (RAC)</h4>
-            </div>
-
-            <div class="report-tile">
-                <div class="tile-logo-wrapper">
-                    <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="image" />
-                </div>
-                <h4>Regional Peace and Order Council (RPOC)</h4>
-            </div>
-
+            @foreach($projects as $project)
+                <details class="report-tile" name="ppa-projects">
+                    <summary class="project-summary">
+                        <span class="tile-logo-wrapper">
+                            <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
+                        </span>
+                        <h4>{{ $project }}</h4>
+                        <span class="project-hint">View project details</span>
+                    </summary>
+                    <div class="project-details">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <a class="project-link" href="https://drive.google.com/" target="_blank" rel="noopener noreferrer">
+                            Open project link <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </details>
+            @endforeach
         </div>
     </div>
 </main>
