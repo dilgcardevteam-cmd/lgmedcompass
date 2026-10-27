@@ -32,7 +32,7 @@ return new class extends Migration
 
         // Optional: Full-text index for search columns (MySQL only)
         // Uncomment if you use MySQL and want faster search on these columns
-        // DB::statement('ALTER TABLE documents ADD FULLTEXT INDEX documents_search_idx (subject_title, requesting_office, focal_person)');
+        // DB::statement('ALTER TABLE documents ADD FULLTEXT INDEX documents_search_idx (subject_title, focal_person)');
     }
 
     /**

@@ -174,14 +174,14 @@
                                             data-updated="{{ $doc->updated_at->format('M d, Y • h:i A') }}"
                                             data-deadline="{{ $modalDeadline }}"
                                             data-frequency="{{ ucfirst($doc->frequency) }}"
-                                            data-office="{{ $doc->recipient_name }}"
                                             data-reference="{{ $doc->reference ?? '' }}"
                                             data-mode="{{ $doc->mode_of_submission ?? '' }}"
                                             data-link="{{ $doc->cy_link ?? '' }}"
                                             data-document-link="{{ $doc->document_link ?? '' }}"
                                             data-remarks="{{ $doc->remarks ?? '' }}"
-                                            data-files='@json($doc->file_path ? json_decode($doc->file_path) : [])'
-                                            data-recipient="{{ $doc->recipient_name ?? 'Not specified' }}">
+                                            data-who-will-comply='@json($doc->who_will_comply ?? [])'
+                                            data-who-will-comply-other="{{ $doc->who_will_comply_other ?? '' }}"
+                                            data-files='@json($doc->file_path ? json_decode($doc->file_path) : [])'>
                                     </button>
 
                                 <div class="p-8 pb-4">
@@ -436,41 +436,6 @@
                             </div>
                             
                             <div>
-                                <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Origin <span class="text-red-500">*</span></label>
-                                <select name="from" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none cursor-pointer">
-                                    <option value="RO-CO" {{ old('from')=='RO-CO' ? 'selected' : '' }}>RO-CO (Regional to Central)</option>
-                                    <option value="PO-RO" {{ old('from')=='PO-RO' ? 'selected' : '' }}>PO-RO (Provincial to Regional)</option>
-                                    <option value="CO-RO" {{ old('from')=='CO-RO' ? 'selected' : '' }}>CO-RO (Central to Regional)</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Requesting Office <span class="text-red-500">*</span></label>
-                                <div class="relative w-full combobox-container">
-                                    <input type="text" name="recipient_name" 
-                                        class="combobox-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none pr-10"
-                                        required
-                                        value="{{ old('recipient_name') }}"
-                                        autocomplete="off">
-                                    <button type="button" class="combobox-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </button>
-                                    <ul class="combobox-list absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto hidden">
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">BLGS</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">BLGD</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">NBOO</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">LGCO</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">LGCDD</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">FAD</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">CASH</li>
-                                        <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer">LGA</li>
-                                    </ul>
-                                </div>
-                            </div>  
-
-                            <div>
                                 <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Section <span class="text-red-500">*</span></label>
                                 <select name="section" id="upload-section-select" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none cursor-pointer" required>
                                     @foreach($sections as $section)
@@ -485,15 +450,40 @@
                             <div>
                                 <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Frequency <span class="text-red-500">*</span></label>
                                 <select name="frequency" id="uploadFrequency" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none cursor-pointer" required>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="bi-monthly">Bi-monthly (twice per month)</option>
                                     <option value="monthly">Monthly</option>
                                     <option value="quarterly">Quarterly</option>
+                                    <option value="semestral">Semestral</option>
                                     <option value="annual">Annual</option>
+                                    <option value="as-needed">As need arises</option>
                                 </select>
                             </div>
+
+                            @php
+                                $uploadWhoWillComply = old('who_will_comply', []);
+                                $uploadWhoWillComply = is_array($uploadWhoWillComply) ? $uploadWhoWillComply : [];
+                            @endphp
+                            <fieldset class="md:col-span-2 lg:col-span-3">
+                                <legend class="text-[10px] font-bold text-gray-500 mb-2 block uppercase">Who will comply</legend>
+                                <p class="text-xs text-gray-500 mb-3">Select all that apply.</p>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    @foreach(['LGU', 'DILG FOU', 'MGLOO', 'BARANGAY', 'Others'] as $option)
+                                        <label class="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                                            <input type="checkbox" name="who_will_comply[]" value="{{ $option }}" class="who-will-comply-option rounded border-gray-300 text-yellow-600 focus:ring-yellow-500" {{ in_array($option, $uploadWhoWillComply, true) ? 'checked' : '' }}>
+                                            <span>{{ $option }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <div class="who-will-comply-other mt-3 {{ in_array('Others', $uploadWhoWillComply, true) ? '' : 'hidden' }}">
+                                    <label for="whoWillComplyOtherUpload" class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Specify other</label>
+                                    <input type="text" id="whoWillComplyOtherUpload" name="who_will_comply_other" maxlength="255" value="{{ old('who_will_comply_other') }}" class="who-will-comply-other-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none" placeholder="Specify who will comply">
+                                </div>
+                            </fieldset>
                         </div>
 
                         <div class="mt-6 p-5 bg-red-50/50 rounded-2xl border border-red-100">
-                            <label class="text-[10px] font-bold text-red-600 mb-3 block uppercase tracking-widest"><i class="bi bi-calendar-event"></i> Reporting Deadlines <span class="text-red-500">*</span></label>
+                            <label class="text-[10px] font-bold text-red-600 mb-3 block uppercase tracking-widest"><i class="bi bi-calendar-event"></i> Reporting Deadlines <span class="text-xs font-normal normal-case text-gray-500">(optional)</span></label>
                             <div id="deadlineContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                         </div>
                     </div>
@@ -529,7 +519,7 @@
                             <label class="text-[11px] uppercase font-bold text-gray-400 tracking-widest ml-1">Submission Details</label>
                             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Reference No.</label>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">DMS No.</label>
                                     <input type="text" name="reference" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none">
                                 </div>
                                 <div>
@@ -667,41 +657,6 @@
                                 </div>
 
                                 <div>
-                                    <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">From <span class="text-red-500">*</span></label>
-                                    <select name="from" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-400" required>
-                                        <option value="RO-CO" {{ old('from', $doc->from)=='RO-CO' ? 'selected' : '' }}>RO-CO</option>
-                                        <option value="PO-RO" {{ $doc->from=='PO-RO' ? 'selected' : '' }}>PO-RO</option>
-                                        <option value="CO-RO" {{ old('from', $doc->from)=='CO-RO' ? 'selected' : '' }}>CO-RO</option>
-                                    </select>
-                                </div>
-
-                            <div class="lg:col-span-2">
-                                    <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Recipient Name <span class="text-red-500">*</span></label>
-                                    <div class="relative w-full combobox-container">
-                                        <input type="text" name="recipient_name" 
-                                            class="combobox-input w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-400 pr-10"
-                                            required
-                                            value="{{ old('recipient_name', $doc->recipient_name) }}"
-                                            autocomplete="off">
-                                        <button type="button" class="combobox-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                            </svg>
-                                        </button>
-                                        <ul class="combobox-list absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto hidden">
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">BLGS</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">BLGD</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">NBOO</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">LGCO</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">LGCDD</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">FAD</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">CASH</li>
-                                            <li class="px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer">LGA</li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div>
                                     <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Section <span class="text-red-500">*</span></label>
                                     @php
                                         $selectedSection = old('section', $doc->section);
@@ -723,15 +678,41 @@
                                 <div>
                                     <label class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Frequency <span class="text-red-500">*</span></label>
                                     <select name="frequency" class="edit-frequency w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-400" data-doc-id="{{ $doc->id }}" required>
+                                        <option value="weekly" {{ old('frequency', $doc->frequency)=='weekly' ? 'selected' : '' }}>Weekly</option>
+                                        <option value="bi-monthly" {{ old('frequency', $doc->frequency)=='bi-monthly' ? 'selected' : '' }}>Bi-monthly (twice per month)</option>
                                         <option value="monthly" {{ old('frequency', $doc->frequency)=='monthly' ? 'selected' : '' }}>Monthly</option>
                                         <option value="quarterly" {{ old('frequency', $doc->frequency)=='quarterly' ? 'selected' : '' }}>Quarterly</option>
+                                        <option value="semestral" {{ old('frequency', $doc->frequency)=='semestral' ? 'selected' : '' }}>Semestral</option>
                                         <option value="annual" {{ old('frequency', $doc->frequency)=='annual' ? 'selected' : '' }}>Annual</option>
+                                        <option value="as-needed" {{ old('frequency', $doc->frequency)=='as-needed' ? 'selected' : '' }}>As need arises</option>
                                     </select>
                                 </div>
 
+                                @php
+                                    $selectedWhoWillComply = old('who_will_comply', $doc->who_will_comply ?? []);
+                                    $selectedWhoWillComply = is_array($selectedWhoWillComply) ? $selectedWhoWillComply : [];
+                                @endphp
+                                <fieldset class="md:col-span-2 lg:col-span-3">
+                                    <legend class="text-[10px] font-bold text-gray-500 mb-2 block uppercase">Who will comply</legend>
+                                    <input type="hidden" name="who_will_comply_present" value="1">
+                                    <p class="text-xs text-gray-500 mb-3">Select all that apply.</p>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        @foreach(['LGU', 'DILG FOU', 'MGLOO', 'BARANGAY', 'Others'] as $option)
+                                            <label class="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                                                <input type="checkbox" name="who_will_comply[]" value="{{ $option }}" class="who-will-comply-option rounded border-gray-300 text-blue-600 focus:ring-blue-500" {{ in_array($option, $selectedWhoWillComply, true) ? 'checked' : '' }}>
+                                                <span>{{ $option }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="who-will-comply-other mt-3 {{ in_array('Others', $selectedWhoWillComply, true) ? '' : 'hidden' }}">
+                                        <label for="whoWillComplyOther{{ $doc->id }}" class="text-[10px] font-bold text-gray-500 mb-1 block uppercase">Specify other</label>
+                                        <input type="text" id="whoWillComplyOther{{ $doc->id }}" name="who_will_comply_other" maxlength="255" value="{{ old('who_will_comply_other', $doc->who_will_comply_other) }}" class="who-will-comply-other-input w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Specify who will comply">
+                                    </div>
+                                </fieldset>
+
                                 <div class="md:col-span-2">
                                     <div class="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
-                                        <label class="text-[10px] font-bold text-blue-600 mb-3 block uppercase tracking-widest"><i class="bi bi-calendar-check"></i> Adjust Deadlines <span class="text-red-500">*</span></label>
+                                        <label class="text-[10px] font-bold text-blue-600 mb-3 block uppercase tracking-widest"><i class="bi bi-calendar-check"></i> Adjust Deadlines <span class="text-xs font-normal normal-case text-gray-500">(optional)</span></label>
                                         <div id="deadlineContainer{{ $doc->id }}" class="deadline-container grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                                     </div>
                                 </div>
@@ -830,10 +811,6 @@
                         <div class="flex items-center text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shadow-sm">
                             <i class="bi bi-person-circle text-yellow-600 mr-2"></i> 
                             <span>Focal: <strong id="viewFocal" class="text-gray-800 font-semibold">Jane Doe</strong></span>
-                        </div>
-                        <div class="flex items-center text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shadow-sm">
-                            <i class="bi bi-building text-yellow-600 mr-2"></i> 
-                            <span>Office: <strong id="viewOffice" class="text-gray-800 font-semibold">—</strong></span>
                         </div>
                     </div>
                 </div>
@@ -938,6 +915,10 @@
                                 <label class="text-[10px] uppercase font-bold text-gray-400 tracking-widest block mb-1">Submission Mode</label>
                                 <div id="viewMode" class="text-xs font-bold text-gray-700">—</div>
                             </div>
+                            <div class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                <label class="text-[10px] uppercase font-bold text-gray-400 tracking-widest block mb-1">Who will comply</label>
+                                <div id="viewWhoWillComply" class="text-xs font-bold text-gray-700">—</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1020,8 +1001,14 @@
                     
                     if (frequency === 'monthly') {
                         date.setMonth(startDate.getMonth() + (i - startIndex));
+                    } else if (frequency === 'bi-monthly') {
+                        date.setDate(startDate.getDate() + ((i - startIndex) * 15));
                     } else if (frequency === 'quarterly') {
                         date.setMonth(startDate.getMonth() + ((i - startIndex) * 3));
+                    } else if (frequency === 'semestral') {
+                        date.setMonth(startDate.getMonth() + ((i - startIndex) * 6));
+                    } else if (frequency === 'weekly') {
+                        date.setDate(startDate.getDate() + ((i - startIndex) * 7));
                     } else if (frequency === 'annual') {
                         date.setFullYear(startDate.getFullYear() + (i - startIndex));
                     }
@@ -1031,7 +1018,7 @@
                 
                 return dates;
             }
-            function generateDeadlines(container, count, existingDates = [], isRequired = true, frequency = null) {
+            function generateDeadlines(container, count, existingDates = [], frequency = null) {
                 container.innerHTML = "";
                 const pickers = [];
                 
@@ -1050,7 +1037,7 @@
                     const input = document.createElement("input");
                     input.type = "text";
                     input.name = "deadlines[]";
-                    input.required = isRequired;
+                    input.required = false;
                     input.placeholder = "Select date";
                     input.dataset.label = `Reporting deadline ${i + 1}`;
                     input.dataset.index = i;
@@ -1146,7 +1133,7 @@
                             // Re-enable input and reinitialize picker
                             input.value = '';
                             input.readOnly = false;
-                            input.required = isRequired;
+                            input.required = false;
                             input.classList.remove('bg-gray-100');
                             input.style.cursor = '';
                             initDatePicker();
@@ -1217,25 +1204,32 @@
                 const forms = document.querySelectorAll('form');
                 forms.forEach(form => {
                     const deadlineInputs = form.querySelectorAll('input[name="deadlines[]"]');
-                    let hasValidInput = false;
-                    
                     deadlineInputs.forEach(input => {
-                        if (input.value && input.value.trim() !== '') {
-                            hasValidInput = true;
-                        }
-                    });
-                    
-                    // Update HTML5 validation for all deadline inputs
-                    deadlineInputs.forEach(input => {
-                        if (hasValidInput) {
-                            input.required = false;
-                        } else {
-                            // Only require if not readOnly and not N/A
-                            input.required = !input.readOnly && input.value !== 'N/A';
-                        }
+                        input.required = false;
                     });
                 });
             }
+
+            function updateWhoWillComplyOther(form) {
+                const othersCheckbox = Array.from(form.querySelectorAll('.who-will-comply-option'))
+                    .find(checkbox => checkbox.value === 'Others');
+                const otherContainer = form.querySelector('.who-will-comply-other');
+                const otherInput = form.querySelector('.who-will-comply-other-input');
+                if (!othersCheckbox || !otherContainer || !otherInput) return;
+
+                otherContainer.classList.toggle('hidden', !othersCheckbox.checked);
+                otherInput.required = othersCheckbox.checked;
+                if (!othersCheckbox.checked) otherInput.value = '';
+            }
+
+            document.querySelectorAll('form').forEach(form => {
+                if (form.querySelector('.who-will-comply-option')) updateWhoWillComplyOther(form);
+            });
+            document.addEventListener('change', function (event) {
+                if (!event.target.matches('.who-will-comply-option')) return;
+                const form = event.target.closest('form');
+                if (form) updateWhoWillComplyOther(form);
+            });
 
             // ================= MODAL MANAGEMENT =================
             function openModal(modalId) {
@@ -1359,20 +1353,29 @@
             });
             const uploadFrequency = document.getElementById('uploadFrequency');
             const deadlineContainer = document.getElementById('deadlineContainer');
+            const getFrequencyCount = (frequency) => ({
+                weekly: 52,
+                'bi-monthly': 24,
+                monthly: 12,
+                quarterly: 4,
+                semestral: 2,
+                annual: 1,
+                'as-needed': 1
+            }[frequency] || 1);
             function initUploadDeadlines() {
                 if (!uploadFrequency || !deadlineContainer) return;
                 let freq = uploadFrequency.value;
-                let count = freq === 'monthly' ? 12 : (freq === 'quarterly' ? 4 : 1);
+                let count = getFrequencyCount(freq);
                 const oldDeadlines = @json(old('deadlines', []));
                 const deadlinesToUse = oldDeadlines.length === count ? oldDeadlines : [];
-                generateDeadlines(deadlineContainer, count, deadlinesToUse, true, freq);
+                generateDeadlines(deadlineContainer, count, deadlinesToUse, freq);
             }
             if (uploadFrequency) {
                 uploadFrequency.removeEventListener('change', window._uploadFreqChange);
                 window._uploadFreqChange = function () {
                     let freq = this.value;
-                    let count = freq === 'monthly' ? 12 : (freq === 'quarterly' ? 4 : 1);
-                    generateDeadlines(deadlineContainer, count, [], true, freq);
+                    let count = getFrequencyCount(freq);
+                    generateDeadlines(deadlineContainer, count, [], freq);
                     validateModalForm(this.closest('form'));
                 };
                 uploadFrequency.addEventListener('change', window._uploadFreqChange);
@@ -1393,13 +1396,12 @@
                 const freqSelect = modal.querySelector('.edit-frequency');
                 const container = modal.querySelector('.deadline-container');
                 if (!freqSelect || !container) return;
-                const getFrequencyCount = (freq) => freq === "monthly" ? 12 : (freq === "quarterly" ? 4 : 1);
                 const initialCount = getFrequencyCount(freqSelect.value);
                 const originalDates = window.originalDatesMap[docId] || [];
-                generateDeadlines(container, initialCount, originalDates, false, freqSelect.value);
+                generateDeadlines(container, initialCount, originalDates, freqSelect.value);
                 freqSelect.removeEventListener('change', window._editFreqChangeHandler);
                 const handler = function () { 
-                    generateDeadlines(container, getFrequencyCount(this.value), [], false, this.value); 
+                    generateDeadlines(container, getFrequencyCount(this.value), [], this.value);
                 };
                 freqSelect.addEventListener('change', handler);
                 window._editFreqChangeHandler = handler;
@@ -1529,11 +1531,15 @@
                 setText('viewUpdated', data.updated);
                 setText('viewDeadline', data.deadline);
                 setText('viewFrequency', data.frequency);
-                setText('viewOffice', data.office);
                 setText('viewReference', data.reference);
                 setText('viewMode', data.mode);
                 setText('viewLink', data.link);
                 setText('viewRemarks', data.remarks);
+                const whoWillComply = JSON.parse(data.whoWillComply || '[]');
+                if (whoWillComply.includes('Others') && data.whoWillComplyOther) {
+                    whoWillComply.push(data.whoWillComplyOther);
+                }
+                setText('viewWhoWillComply', whoWillComply.join(', '));
 
                 // --- Status badge with colors (FIXED) ---
                 const statusSpan = document.getElementById('viewStatus');
@@ -1669,7 +1675,7 @@
                                         attachmentsHtml = '<span class="text-sm text-yellow-600"><i class="bi bi-exclamation-circle"></i> No file uploaded</span>';
                                     }
                                     const cardHtml = `<div class="doc-card bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden border border-gray-200 flex flex-col">
-                                        <button type="button" class="hidden view-trigger-btn" data-status="${escapeHtml(doc.status)}" data-subject="${escapeHtml(doc.subject_title)}" data-focal="${escapeHtml(doc.focal_person)}" data-created="${escapeHtml(doc.created_at_formatted)}" data-updated="${escapeHtml(doc.updated_at_formatted)}" data-deadline="${escapeHtml(doc.next_due_date || 'No deadline')}" data-frequency="${escapeHtml(doc.frequency)}" data-office="${escapeHtml(doc.requesting_office || doc.recipient_name || '')}" data-reference="${escapeHtml(doc.reference || '')}" data-mode="${escapeHtml(doc.mode_of_submission || '')}" data-link="${escapeHtml(doc.cy_link || '')}" data-document-link="${escapeHtml(doc.document_link || '')}" data-remarks="${escapeHtml(doc.remarks || '')}" data-files='${JSON.stringify(doc.files)}' data-recipient="${escapeHtml(doc.recipient_name || 'Not specified')}"></button>
+                                        <button type="button" class="hidden view-trigger-btn" data-status="${escapeHtml(doc.status)}" data-subject="${escapeHtml(doc.subject_title)}" data-focal="${escapeHtml(doc.focal_person)}" data-created="${escapeHtml(doc.created_at_formatted)}" data-updated="${escapeHtml(doc.updated_at_formatted)}" data-deadline="${escapeHtml(doc.next_due_date || 'No deadline')}" data-frequency="${escapeHtml(doc.frequency)}" data-reference="${escapeHtml(doc.reference || '')}" data-mode="${escapeHtml(doc.mode_of_submission || '')}" data-link="${escapeHtml(doc.cy_link || '')}" data-document-link="${escapeHtml(doc.document_link || '')}" data-remarks="${escapeHtml(doc.remarks || '')}" data-who-will-comply="${escapeHtml(JSON.stringify(doc.who_will_comply || []))}" data-who-will-comply-other="${escapeHtml(doc.who_will_comply_other || '')}" data-files='${JSON.stringify(doc.files)}"></button>
                                         <div class="p-4 border-b border-gray-100 flex justify-between items-start gap-2"><div class="font-bold text-gray-800 text-lg truncate min-w-0" title="${escapeHtml(doc.subject_title)}">${escapeHtml(doc.subject_title)}</div><button type="button" class="doc-open-btn shrink-0 text-gray-500 hover:text-gray-700 transition" data-document-link="${escapeHtml(doc.document_link || '')}"><i class="bi bi-arrow-up-right"></i></button></div>
                                         <div class="px-4 pt-2 pb-1"><div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden"><div class="absolute top-0 left-0 h-full rounded-full" style="width: ${percentage}%; background-color: ${progressColor};"></div></div><div class="text-right text-xs text-gray-600 mt-1">${percentage}%</div></div>
                                         <div class="px-4 py-2 flex items-center gap-2"><span class="text-sm font-medium text-gray-700 flex items-center gap-1"><i class="bi bi-check-circle"></i> Status:</span><form action="/documents/${doc.id}/status" method="POST" class="inline-block"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="PATCH"><select name="status" class="border border-gray-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-yellow-400" onchange="this.form.submit()"><option value="To Do" ${doc.status === 'To Do' ? 'selected' : ''}>To Do</option><option value="In Progress" ${doc.status === 'In Progress' ? 'selected' : ''}>In Progress</option><option value="In Review" ${doc.status === 'In Review' ? 'selected' : ''}>In Review</option><option value="Revision" ${doc.status === 'Revision' ? 'selected' : ''}>Revision</option><option value="Done" ${doc.status === 'Done' ? 'selected' : ''}>Done</option><option value="Incomplete" ${doc.status === 'Incomplete' ? 'selected' : ''}>Incomplete</option></select></form></div>

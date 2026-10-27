@@ -60,7 +60,6 @@ class DocumentController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('subject_title', 'like', "%{$search}%")
                     ->orWhere('focal_person', 'like', "%{$search}%")
-                    ->orWhere('recipient_name', 'like', "%{$search}%")
                     ->orWhere('frequency', 'like', "%{$search}%");
             });
         }
@@ -293,13 +292,24 @@ class DocumentController extends Controller
      */
     public function store(Request $request)
     {
+        $deadlines = $request->input('deadlines', []);
+        if (is_array($deadlines)) {
+            $deadlines = collect($deadlines)
+                ->filter(fn ($deadline) => filled($deadline))
+                ->values()
+                ->all();
+        }
+        $request->merge(['deadlines' => $deadlines]);
+
         $request->validate([
             'subject_title' => 'required|string|max:255',
-            'from' => 'required|string',
             'section' => 'required|string',
-            'deadlines' => 'required|array',
-            'deadlines.*' => 'required|string',
-            'frequency' => 'required|string',
+            'deadlines' => 'nullable|array',
+            'deadlines.*' => 'nullable|string',
+            'frequency' => 'required|in:weekly,bi-monthly,monthly,quarterly,semestral,annual,as-needed',
+            'who_will_comply' => 'nullable|array',
+            'who_will_comply.*' => 'required|string|in:LGU,DILG FOU,MGLOO,BARANGAY,Others',
+            'who_will_comply_other' => 'nullable|string|max:255',
             'focal_person' => 'required|string|max:255',
             'reference' => 'nullable|string',
             'mode_of_submission' => 'nullable|string',
@@ -308,10 +318,18 @@ class DocumentController extends Controller
             'documents' => 'nullable|array',
             'documents.*' => 'file|mimes:pdf|max:2048',
             'document_link' => 'nullable|url|max:5048',
-            'recipient_name' => 'required|string|max:255',
         ]);
 
-        $this->validateDeadlineCount($request->string('frequency')->toString(), $request->input('deadlines', []));
+        $deadlineCountError = $this->deadlineCountError($request->string('frequency')->toString(), $request->input('deadlines', []));
+        if ($deadlineCountError !== null) {
+            throw ValidationException::withMessages(['deadlines' => $deadlineCountError]);
+        }
+        $whoWillComply = $request->input('who_will_comply', []);
+        $whoWillComply = is_array($whoWillComply) ? $whoWillComply : [];
+        $whoWillComplyOther = in_array('Others', $whoWillComply, true)
+            ? $request->input('who_will_comply_other')
+            : null;
+        $this->validateWhoWillComplyOther($whoWillComply, $whoWillComplyOther);
 
         // Handle file uploads
         $filePaths = null;
@@ -326,9 +344,10 @@ class DocumentController extends Controller
         $document = Document::create([
             'user_id' => auth()->id(),
             'subject_title' => $request->subject_title,
-            'from' => $request->from,
             'section' => $request->section,
             'frequency' => $request->frequency,
+            'who_will_comply' => $whoWillComply,
+            'who_will_comply_other' => $whoWillComplyOther,
             'focal_person' => $request->focal_person,
             'reference' => $request->reference,
             'mode_of_submission' => $request->mode_of_submission,
@@ -338,8 +357,7 @@ class DocumentController extends Controller
             'document_link' => $request->document_link,
             'progress' => 0, // Default progress
             'status' => 'To Do', // Default status
-            'recipient_name' => $request->recipient_name,
-            'deadlines' => $request->deadlines, // Store original deadlines including N/A
+            'deadlines' => $request->input('deadlines', []),
         ]);
         // Create initial assignment for the uploader
         DocumentAssignment::create([
@@ -350,9 +368,8 @@ class DocumentController extends Controller
         ]);
 
         // Create schedules for each deadline
-        foreach ($request->deadlines as $date) {
-            // Skip "N/A" values - don't create schedules for them
-            if (strtoupper(trim($date)) === 'N/A') {
+        foreach ($request->input('deadlines', []) as $date) {
+            if (blank($date) || strtoupper(trim($date)) === 'N/A') {
                 continue;
             }
 
@@ -386,19 +403,24 @@ class DocumentController extends Controller
      */
     public function update(Request $request, Document $document)
     {
-        $request->merge([
-            'deadlines' => collect($request->input('deadlines', []))
+        $hasDeadlines = $request->exists('deadlines');
+        $hasWhoWillComply = $request->boolean('who_will_comply_present');
+        $deadlines = $request->input('deadlines', []);
+        if (is_array($deadlines)) {
+            $deadlines = collect($deadlines)
                 ->filter(fn ($deadline) => filled($deadline))
                 ->values()
-                ->all(),
-        ]);
+                ->all();
+        }
+        $request->merge(['deadlines' => $deadlines]);
 
         $validator = Validator::make($request->all(), [
             'subject_title' => 'required|string|max:255',
-            'from' => 'required|in:RO-CO,PO-RO',
-            'recipient_name' => 'required|string|max:255',
             'section' => 'required|string|max:255',
-            'frequency' => 'required|in:monthly,quarterly,annual',
+            'frequency' => 'required|in:weekly,bi-monthly,monthly,quarterly,semestral,annual,as-needed',
+            'who_will_comply' => 'nullable|array',
+            'who_will_comply.*' => 'required|string|in:LGU,DILG FOU,MGLOO,BARANGAY,Others',
+            'who_will_comply_other' => 'nullable|string|max:255',
             'deadlines' => 'nullable|array',
             'deadlines.*' => 'nullable|string',
             'focal_person' => 'required|string|max:255',
@@ -410,6 +432,25 @@ class DocumentController extends Controller
             'documents' => 'nullable|array',
             'documents.*' => 'nullable|file|mimes:pdf|max:20000', // 20MB
         ]);
+
+        $validator->after(function ($validator) use ($request): void {
+            $deadlines = $request->input('deadlines', []);
+            if (! is_array($deadlines)) {
+                return;
+            }
+
+            $deadlineCountError = $this->deadlineCountError(
+                (string) $request->input('frequency'),
+                $deadlines
+            );
+            if ($deadlineCountError !== null) {
+                $validator->errors()->add('deadlines', $deadlineCountError);
+            }
+            $whoWillComply = $request->input('who_will_comply', []);
+            if (is_array($whoWillComply) && in_array('Others', $whoWillComply, true) && blank($request->input('who_will_comply_other'))) {
+                $validator->errors()->add('who_will_comply_other', 'Please specify who will comply.');
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -427,8 +468,6 @@ class DocumentController extends Controller
 
         $documentData = [
             'subject_title' => $data['subject_title'],
-            'from' => $data['from'],
-            'recipient_name' => $data['recipient_name'],
             'section' => $data['section'],
             'frequency' => $data['frequency'],
             'focal_person' => $data['focal_person'],
@@ -437,8 +476,18 @@ class DocumentController extends Controller
             'cy_link' => $data['cy_link'] ?? null,
             'document_link' => $data['document_link'] ?? null,
             'remarks' => $data['remarks'] ?? null,
-            'deadlines' => $data['deadlines'] ?? [], // Store original deadlines including N/A
         ];
+        if ($hasWhoWillComply) {
+            $whoWillComply = $data['who_will_comply'] ?? [];
+            $whoWillComply = is_array($whoWillComply) ? $whoWillComply : [];
+            $documentData['who_will_comply'] = $whoWillComply;
+            $documentData['who_will_comply_other'] = in_array('Others', $whoWillComply, true)
+                ? ($data['who_will_comply_other'] ?? null)
+                : null;
+        }
+        if ($hasDeadlines) {
+            $documentData['deadlines'] = $data['deadlines'] ?? [];
+        }
 
         // Handle file uploads
         if ($request->hasFile('documents')) {
@@ -462,13 +511,11 @@ class DocumentController extends Controller
             $this->createFocalPersonNotification($document, $oldFocalPerson, $newFocalPerson);
         }
 
-        $deadlines = $data['deadlines'] ?? [];
-        if ($deadlines !== []) {
-            // Update schedules only when the edit modal submits at least one due date.
+        if ($hasDeadlines) {
+            $deadlines = $data['deadlines'] ?? [];
             $document->schedules()->delete();
             foreach ($deadlines as $dueDate) {
-                // Skip "N/A" values - don't create schedules for them
-                if (strtoupper(trim($dueDate)) === 'N/A') {
+                if (blank($dueDate) || strtoupper(trim($dueDate)) === 'N/A') {
                     continue;
                 }
 
@@ -511,8 +558,7 @@ class DocumentController extends Controller
 
         $documents = Document::when($search, function ($query) use ($search) {
             $query->where('subject_title', 'like', "%{$search}%")
-                ->orWhere('focal_person', 'like', "%{$search}%")
-                ->orWhere('requesting_office', 'like', "%{$search}%");
+                ->orWhere('focal_person', 'like', "%{$search}%");
         })
             ->orderBy('created_at', 'desc')
             ->latest()
@@ -528,7 +574,6 @@ class DocumentController extends Controller
 
         $documents = Document::where('subject_title', 'like', "%{$search}%")
             ->orWhere('focal_person', 'like', "%{$search}%")
-            ->orWhere('requesting_office', 'like', "%{$search}%")
             ->orderBy('created_at', 'desc')
             ->latest()
             ->limit(6)
@@ -546,7 +591,6 @@ class DocumentController extends Controller
             ->where(function ($q) use ($search) {
                 $q->where('subject_title', 'like', "%{$search}%")
                     ->orWhere('focal_person', 'like', "%{$search}%")
-                    ->orWhere('recipient_name', 'like', "%{$search}%")
                     ->orWhere('frequency', 'like', "%{$search}%");
             });
 
@@ -648,7 +692,6 @@ class DocumentController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('subject_title', 'like', "%{$search}%")
-                        ->orWhere('recipient_name', 'like', "%{$search}%")
                         ->orWhere('focal_person', 'like', "%{$search}%");
                 });
             })
@@ -847,21 +890,28 @@ class DocumentController extends Controller
 
         switch ($document->frequency) {
             case 'annual':
+            case 'as-needed':
                 // Mark document as Done and set progress to 100%
                 $document->update(['status' => 'Done', 'progress' => 100]);
                 $document->schedules()->update(['status' => 'completed']);
                 $document->delete();
+                $message = $document->frequency === 'annual'
+                    ? 'Annual document marked as Done.'
+                    : 'As-needed document marked as Done.';
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Annual document marked as Done.',
+                    'message' => $message,
                     'new_status' => 'Done',
                     'progress' => 100,
                     'next_due_date' => null,
                 ]);
 
             case 'monthly':
+            case 'bi-monthly':
             case 'quarterly':
+            case 'semestral':
+            case 'weekly':
                 // Find the earliest pending schedule
                 $currentSchedule = $document->schedules()
                     ->where('status', 'pending')
@@ -875,11 +925,7 @@ class DocumentController extends Controller
                         return response()->json(['success' => false, 'message' => 'No schedule found.'], 400);
                     }
                     $nextDueDate = Carbon::parse($lastSchedule->due_date);
-                    if ($document->frequency === 'monthly') {
-                        $nextDueDate->addMonth();
-                    } else {
-                        $nextDueDate->addMonths(3);
-                    }
+                    $this->advanceDueDate($nextDueDate, $document->frequency);
                     $document->schedules()->create([
                         'due_date' => $nextDueDate,
                         'status' => 'pending',
@@ -891,11 +937,7 @@ class DocumentController extends Controller
 
                     // Create the next schedule
                     $nextDueDate = Carbon::parse($currentSchedule->due_date);
-                    if ($document->frequency === 'monthly') {
-                        $nextDueDate->addMonth();
-                    } else {
-                        $nextDueDate->addMonths(3);
-                    }
+                    $this->advanceDueDate($nextDueDate, $document->frequency);
                     $document->schedules()->create([
                         'due_date' => $nextDueDate,
                         'status' => 'pending',
@@ -936,28 +978,46 @@ class DocumentController extends Controller
         }
     }
 
-    private function validateDeadlineCount(string $frequency, array $deadlines): void
+    private function deadlineCountError(string $frequency, array $deadlines): ?string
     {
         $expectedCount = match ($frequency) {
+            'weekly' => 52,
+            'bi-monthly' => 24,
             'monthly' => 12,
             'quarterly' => 4,
+            'semestral' => 2,
             'annual' => 1,
+            'as-needed' => 1,
             default => null,
         };
 
-        if ($expectedCount === null) {
-            return;
+        if ($expectedCount === null || count($deadlines) <= $expectedCount) {
+            return null;
         }
 
-        if (count($deadlines) !== $expectedCount) {
-            $label = match ($frequency) {
-                'monthly' => 'Monthly documents require exactly 12 deadlines.',
-                'quarterly' => 'Quarterly documents require exactly 4 deadlines.',
-                'annual' => 'Annual documents require exactly 1 deadline.',
-            };
+        return ucfirst($frequency).' documents allow up to '.$expectedCount.' reporting deadlines.';
+    }
 
+    private function advanceDueDate(Carbon $date, string $frequency): Carbon
+    {
+        return match ($frequency) {
+            'weekly' => $date->addWeek(),
+            'bi-monthly' => $date->addDays(15),
+            'monthly' => $date->addMonth(),
+            'quarterly' => $date->addMonths(3),
+            'semestral' => $date->addMonths(6),
+            default => $date,
+        };
+    }
+
+    /**
+     * @param  array<int, string>  $whoWillComply
+     */
+    private function validateWhoWillComplyOther(array $whoWillComply, ?string $whoWillComplyOther): void
+    {
+        if (in_array('Others', $whoWillComply, true) && blank($whoWillComplyOther)) {
             throw ValidationException::withMessages([
-                'deadlines' => $label,
+                'who_will_comply_other' => 'Please specify who will comply.',
             ]);
         }
     }

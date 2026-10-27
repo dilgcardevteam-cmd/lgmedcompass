@@ -17,11 +17,11 @@ class Document extends Model
     protected $fillable = [
         'user_id',
         'subject_title',
-        'from',
         'section',
         'frequency',
+        'who_will_comply',
+        'who_will_comply_other',
         'focal_person',
-        'requesting_office',
         'reference',
         'mode_of_submission',
         'cy_link',
@@ -30,7 +30,6 @@ class Document extends Model
         'document_link',
         'progress',
         'status',
-        'recipient_name',
         'deadlines',
     ];
 
@@ -38,6 +37,7 @@ class Document extends Model
         'deadline' => 'date',
         'is_archived' => 'boolean',
         'deadlines' => 'array',
+        'who_will_comply' => 'array',
     ];
 
     public function focalPerson(): BelongsTo

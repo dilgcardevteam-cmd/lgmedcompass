@@ -88,8 +88,8 @@
                 <select name="frequency" onchange="this.form.submit()"
                         class="block w-full py-2.5 border-gray-200 rounded-xl focus:ring-yellow-500 focus:border-yellow-500 text-sm">
                     <option value="">All Frequencies</option>
-                    @foreach(['monthly', 'quarterly', 'annual'] as $freq)
-                        <option value="{{ $freq }}" {{ request('frequency') == $freq ? 'selected' : '' }}>{{ ucfirst($freq) }}</option>
+                    @foreach(['weekly', 'bi-monthly', 'monthly', 'quarterly', 'semestral', 'annual', 'as-needed'] as $freq)
+                        <option value="{{ $freq }}" {{ request('frequency') == $freq ? 'selected' : '' }}>{{ $freq === 'as-needed' ? 'As need arises' : ($freq === 'bi-monthly' ? 'Bi-monthly (twice per month)' : ucfirst($freq)) }}</option>
                     @endforeach
                 </select>
 
@@ -110,7 +110,6 @@
                      data-delete-after="{{ \Carbon\Carbon::parse($doc->deleted_at)->addYears(3)->format('M d, Y') }}"
                      data-section="{{ $doc->section ? App\Models\Section::find($doc->section)?->name : 'Not specified' }}"
                      data-frequency="{{ ucfirst($doc->frequency) }}"
-                     data-recipient="{{ $doc->recipient_name ?? 'Not specified' }}"
                      data-remarks="{{ $doc->remarks ?? 'No remarks' }}"
                      data-document-link="{{ $doc->document_link ?? '' }}"
                      data-files='@json($doc->file_path ? json_decode($doc->file_path) : [])'>
@@ -285,13 +284,6 @@
                                     <i class="bi bi-calendar-week me-1"></i> —
                                 </p>
                             </div>
-                            <!-- ✅ ADDED Recipient row -->
-                            <div class="col-6">
-                                <label class="text-uppercase text-muted extra-small fw-bold d-block mb-1">Recipient</label>
-                                <p id="viewRecipient" class="fw-medium text-dark small mb-0">
-                                    <i class="bi bi-envelope me-1"></i> —
-                                </p>
-                            </div>
                         </div>
                     </div>
 
@@ -402,7 +394,6 @@
             const deleteAfter = this.dataset.deleteAfter || '-';
             const section = this.dataset.section || '—';
             const frequency = this.dataset.frequency || '—';
-            const recipient = this.dataset.recipient || '—';
             const remarks = this.dataset.remarks || 'No remarks';
             const docLink = this.dataset.documentLink || '';
             let files = [];
@@ -427,7 +418,6 @@
             document.getElementById('viewDeleteAfter').innerText = deleteAfter;
             document.getElementById('viewSection').innerText = section;
             document.getElementById('viewFrequency').innerText = frequency;
-            document.getElementById('viewRecipient').innerText = recipient;
             document.getElementById('viewRemarks').innerText = remarks;
 
             // Handle document link
