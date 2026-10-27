@@ -286,32 +286,7 @@
         </div>
 
         <div class="modern-grid">
-            @php
-                $projects = [
-                    'Inventory/Supplies/Properties',
-                    'Monitor the submission of Administrative Requirements and other admin matters',
-                    'Records Management',
-                    'Take Minutes of Division and SPMS-related meetings',
-                ];
-            @endphp
-
-            @foreach($projects as $project)
-                <details class="report-tile" name="ppa-projects">
-                    <summary class="project-summary">
-                        <span class="tile-logo-wrapper">
-                            <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
-                        </span>
-                        <h4>{{ $project }}</h4>
-                        <span class="project-hint">View project details</span>
-                    </summary>
-                    <div class="project-details">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        <a class="project-link" href="https://drive.google.com/" target="_blank" rel="noopener noreferrer">
-                            Open project link <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </details>
-            @endforeach
+            @include('landingpage.partials.project-grid')
         </div>
     </div>
 </main>

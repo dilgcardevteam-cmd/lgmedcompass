@@ -8,7 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentWorkflowController;
 use App\Http\Controllers\DriveController;
-use App\Http\Controllers\PpaController;
+use App\Http\Controllers\PpaProjectController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SectionController;
@@ -31,11 +31,11 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 // Landing pages for divisions (public)
 Route::prefix('landingpage')->name('landingpage.')->group(function () {
-    Route::get('/lgrpcs', fn () => view('landingpage.lp-lgrpcs'))->name('lgrpcs');
-    Route::get('/lgpmras', fn () => view('landingpage.lp-lgpmras'))->name('lgpmras');
-    Route::get('/lgpopscm', fn () => view('landingpage.lp-lgpopscm'))->name('lgpopscm');
-    Route::get('/ssu', fn () => view('landingpage.lp-ssu'))->name('ssu');
-    Route::get('/dsu', fn () => view('landingpage.lp-dsu'))->name('dsu');
+    foreach (['lgrpcs', 'lgpmras', 'lgpopscm', 'ssu', 'dsu'] as $sectionCode) {
+        Route::get("/{$sectionCode}", [PpaProjectController::class, 'landingPage'])
+            ->defaults('sectionCode', $sectionCode)
+            ->name($sectionCode);
+    }
 });
 
 /*
@@ -102,21 +102,9 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
     Route::middleware(['auth'])->group(function () {
         // PPA routes
         Route::prefix('ppa')->name('ppa.')->group(function () {
-            Route::get('/folders/{section}/{parentId?}', [PpaController::class, 'folders'])->name('folders');
-            Route::post('/folder', [PpaController::class, 'createFolder'])->name('folder.create');
-            Route::post('/upload', [PpaController::class, 'uploadFile'])->name('upload');
-            Route::post('/link', [PpaController::class, 'addLink'])->name('link.store');
-            Route::put('/folder/{id}', [PpaController::class, 'renameFolder'])->name('folder.rename');
-            Route::put('/file/{id}', [PpaController::class, 'renameFile'])->name('file.rename');
-            Route::delete('/file/{id}', [PpaController::class, 'deleteFile'])->name('file.delete');
-            Route::delete('/folder/{id}', [PpaController::class, 'deleteFolder'])->name('folder.delete');
-            Route::get('/view/{id}', [PpaController::class, 'viewFile'])->name('file.view');
-
-            Route::get('/folders-list/{divisionId}', [PpaController::class, 'getFoldersByDivision']);
-            Route::put('/move/{type}/{id}', [PpaController::class, 'moveItem']);
-
-            Route::get('/{section}/{parentId?}', [PpaController::class, 'showSection'])->name('section');
-            Route::get('/', [PpaController::class, 'index'])->name('index');
+            Route::put('/project/{project}', [PpaProjectController::class, 'updateProject'])->name('project.update');
+            Route::get('/{section}', [PpaProjectController::class, 'showSection'])->name('section');
+            Route::get('/', [PpaProjectController::class, 'index'])->name('index');
         });
     });
 

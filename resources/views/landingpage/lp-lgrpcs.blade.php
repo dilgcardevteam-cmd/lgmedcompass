@@ -286,48 +286,7 @@
         </div>
 
         <div class="modern-grid">
-            @php
-                $projects = [
-                    'Barangay Assembly',
-                    'Barangay at Kalinisan Day (BarKaDa)',
-                    'Barangay FDP',
-                    'Barangay Road Clearing Operations (BaRCO)',
-                    'CPD-led Programs (Family/RPRH, Population)',
-                    'DA-led',
-                    'Election-Related Concerns (non-legal matters)',
-                    'Full Disclosure Policy (FDP)',
-                    "Halina't magtanim ng Prutas at Gulay (HAPAG)",
-                    'IPMR (Indigenous Peoples Mandatory Representation)',
-                    'Kalinisan sa Bagong Pilipinas Reports',
-                    'Labor & Employment Compliance (DOLE-led)',
-                    'LG Month Celebration',
-                    'LGU Annual Report',
-                    'LGU Celebrations',
-                    'LGU Leagues (Election/Meetings)',
-                    'NCIP-led Activities',
-                    'SK Full Public Disclosure Policy (FPDP)',
-                    'SK, NYC and Youth Related PPAs',
-                    'Social Protection & Vulnerable Sectors (DSWD-led)',
-                ];
-            @endphp
-
-            @foreach($projects as $project)
-                <details class="report-tile" name="ppa-projects">
-                    <summary class="project-summary">
-                        <span class="tile-logo-wrapper">
-                            <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
-                        </span>
-                        <h4>{{ $project }}</h4>
-                        <span class="project-hint">View project details</span>
-                    </summary>
-                    <div class="project-details">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        <a class="project-link" href="https://drive.google.com/" target="_blank" rel="noopener noreferrer">
-                            Open project link <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </details>
-            @endforeach
+            @include('landingpage.partials.project-grid')
         </div>
     </div>
 </main>

@@ -286,41 +286,7 @@
         </div>
 
         <div class="modern-grid">
-            @php
-                $projects = [
-                    'Anti-Drug Abuse Councils (ADAC) Functionality Audit',
-                    'Cockpit and Cockfighting Monitoring',
-                    'Comprehensive Social Benefits Program (CSBP)',
-                    'Enhanced Comprehensive Local Integration Program (ECLIP)',
-                    'Human Rights Action Center (HRAC)',
-                    'Katarungang Pambarangay (KP)',
-                    'Local Legislative Awards (LLA)',
-                    'NTF/RTF ELCAC related activities',
-                    'Philippine Anti-Drugs Strategy (PADS)-related PPAS',
-                    'POGO Report',
-                    'Preventing and Countering Violent Extremism and Insurgency (PCVE)',
-                    'Regional Adjudication Committee (RAC)',
-                    'Regional Peace and Order Council (RPOC)',
-                ];
-            @endphp
-
-            @foreach($projects as $project)
-                <details class="report-tile" name="ppa-projects">
-                    <summary class="project-summary">
-                        <span class="tile-logo-wrapper">
-                            <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
-                        </span>
-                        <h4>{{ $project }}</h4>
-                        <span class="project-hint">View project details</span>
-                    </summary>
-                    <div class="project-details">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        <a class="project-link" href="https://drive.google.com/" target="_blank" rel="noopener noreferrer">
-                            Open project link <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </details>
-            @endforeach
+            @include('landingpage.partials.project-grid')
         </div>
     </div>
 </main>
