@@ -38,19 +38,57 @@
                 </span>
             </div>
 
-            <!-- Focal Person -->
-            <div class="calendar-modal-row icon-field">
-                <x-heroicon-o-user class="input-icon" />
-                <select name="focal_person_id"
-                        class="calendar-modal-input with-icon"
-                        required>
-                    <option value="">Select Focal Person</option>
+            <div data-single-focal-person>
+                <div class="calendar-modal-row icon-field">
+                    <x-heroicon-o-user class="input-icon" />
+                    <select name="focal_person_id"
+                            class="calendar-modal-input with-icon"
+                            required>
+                        <option value="">Select Focal Person</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">
+                                {{ $user->name }} ({{ optional($user->section)->name }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="hidden" data-multiple-focal-person>
+                <div class="calendar-focal-person-heading">
+                    <x-heroicon-o-user-group class="input-icon" />
+                    <div>
+                        <p class="calendar-focal-person-title">Focal Persons</p>
+                        <p class="calendar-focal-person-hint">Select one or more people for this official business.</p>
+                    </div>
+                </div>
+                <div class="calendar-focal-person-search-group">
+                    <div class="calendar-modal-row icon-field calendar-focal-person-search">
+                        <x-heroicon-o-magnifying-glass class="input-icon" />
+                        <input type="search"
+                               id="focalPersonSearch"
+                               class="calendar-modal-input with-icon"
+                               placeholder="Search name, position, or section"
+                               aria-label="Search focal persons"
+                               data-focal-person-search>
+                    </div>
+                    <p class="calendar-focal-person-search-results"
+                       data-focal-person-search-results
+                       aria-live="polite"></p>
+                </div>
+                <fieldset class="calendar-focal-person-options" data-focal-person-options>
+                    <legend class="sr-only">Focal persons</legend>
                     @foreach($users as $user)
-                        <option value="{{ $user->id }}">
-                            {{ $user->name }} ({{ optional($user->section)->name }})
-                        </option>
+                        <label class="calendar-focal-person-option"
+                               data-search-text="{{ $user->name }} {{ $user->position }} {{ optional($user->section)->name }}">
+                            <input type="checkbox"
+                                   name="focal_person_ids[]"
+                                   value="{{ $user->id }}"
+                                   class="calendar-focal-person-checkbox">
+                            <span class="calendar-focal-person-name">{{ $user->name }}</span>
+                        </label>
                     @endforeach
-                </select>
+                </fieldset>
             </div>
 
             @include('calendar.partials.modal-date-fields')

@@ -245,6 +245,14 @@
                     <span class="acronym">Database & Statistical Unit</span>
                 </a>
 
+                <a href="{{ route('landingpage.qms') }}" class="modern-card">
+                    <div class="logo-sphere">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="">
+                    </div>
+                    <h4>QMS</h4>
+                    <span class="acronym">Quality Management System</span>
+                </a>
+
             </div>
         </div>
     </main>

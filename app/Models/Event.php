@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Event extends Model
 {
@@ -45,6 +46,43 @@ class Event extends Model
     public function focalPerson(): BelongsTo
     {
         return $this->belongsTo(User::class, 'focal_person_id');
+    }
+
+    public function focalPersons(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'event_focal_persons')
+            ->withTimestamps();
+    }
+
+    /**
+     * @return list<int|string>
+     */
+    public function focalPersonIds(): array
+    {
+        $ids = $this->focalPersons->modelKeys();
+
+        if ($ids !== []) {
+            return $ids;
+        }
+
+        return $this->focal_person_id === null ? [] : [(int) $this->focal_person_id];
+    }
+
+    public function focalPersonNames(): string
+    {
+        return implode(', ', $this->focalPersonNameList());
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function focalPersonNameList(): array
+    {
+        if ($this->focalPersons->isNotEmpty()) {
+            return $this->focalPersons->pluck('name')->all();
+        }
+
+        return $this->focalPerson === null ? [] : [$this->focalPerson->name];
     }
 
     /*

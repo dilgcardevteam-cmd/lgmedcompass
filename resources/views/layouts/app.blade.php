@@ -181,14 +181,16 @@ body.has-sidebar:not(.sidebar-collapsed) .app-page-content{
 <!-- ================================
      LOADING SCREEN
 ================================ -->
-<div id="loading-screen">
-    <div class="loading-content">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Department_of_the_Interior_and_Local_Government_%28DILG%29_Seal_-_Logo.svg/250px-Department_of_the_Interior_and_Local_Government_%28DILG%29_Seal_-_Logo.svg.png"
-        class="loading-logo">
-        <div class="loading-spinner"></div>
-        <p>Loading LGMED Compass...</p>
+@auth
+    <div id="loading-screen">
+        <div class="loading-content">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Department_of_the_Interior_and_Local_Government_%28DILG%29_Seal_-_Logo.svg/250px-Department_of_the_Interior_and_Local_Government_%28DILG%29_Seal_-_Logo.svg.png"
+            class="loading-logo">
+            <div class="loading-spinner"></div>
+            <p>Loading LGMED Compass...</p>
+        </div>
     </div>
-</div>
+@endauth
 <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="min-h-screen bg-gray-100 ">

@@ -88,6 +88,10 @@
                         <option value="Advisory" {{ request('type') == 'Advisory' ? 'selected' : '' }}>Advisory</option>
                         <option value="Division Order" {{ request('type') == 'Division Order' ? 'selected' : '' }}>Division Order</option>
                         <option value="Office Order" {{ request('type') == 'Office Order' ? 'selected' : '' }}>Office Order</option>
+                        <option value="Regional Order" {{ request('type') == 'Regional Order' ? 'selected' : '' }}>Regional Order</option>
+                        <option value="Post Activity Report" {{ request('type') == 'Post Activity Report' ? 'selected' : '' }}>Post Activity Report</option>
+                        <option value="Invitation Letter" {{ request('type') == 'Invitation Letter' ? 'selected' : '' }}>Invitation Letter</option>
+                        <option value="Others" {{ request('type') == 'Others' ? 'selected' : '' }}>Others</option>
                     </select>
                 </div>
 
@@ -195,6 +199,7 @@
                          data-doc-link="{{ $doc->document_link ?? '' }}"
                          data-doc-last-comment="{{ $doc->last_comment ?? '' }}"
                          data-doc-type-of-paper="{{ $doc->type_of_paper ?? '' }}"
+                         data-doc-type-of-paper-other="{{ $doc->type_of_paper_other ?? '' }}"
                          data-doc-files='@json($doc->file_path)'>
                         
                         <div class="p-4 sm:p-6">
@@ -387,6 +392,7 @@
                          data-doc-link="{{ $doc->document_link ?? '' }}"
                          data-doc-last-comment="{{ $doc->last_comment ?? '' }}"
                          data-doc-type-of-paper="{{ $doc->type_of_paper ?? '' }}"
+                         data-doc-type-of-paper-other="{{ $doc->type_of_paper_other ?? '' }}"
                          data-doc-files='@json($doc->file_path)'>
 
                         <div class="p-6">
@@ -740,8 +746,25 @@
                                 <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Advisory">Advisory</li>
                                 <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Division Order">Division Order</li>
                                 <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Office Order">Office Order</li>
+                                <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Regional Order">Regional Order</li>
+                                <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Post Activity Report">Post Activity Report</li>
+                                <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Invitation Letter">Invitation Letter</li>
+                                <li class="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-100 cursor-pointer" data-value="Others">Others</li>
                             </ul>
                         </div>
+                    </div>
+
+                    <div class="group hidden" data-type-of-paper-other-group>
+                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">
+                            Specify Type of Paper <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="type_of_paper_other"
+                               value="{{ old('type_of_paper_other') }}"
+                               class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all outline-none"
+                               placeholder="Enter the type of paper"
+                               maxlength="255"
+                               disabled>
                     </div>
 
                     <div class="md:col-span-2 group">
@@ -1470,11 +1493,13 @@ if (uploadForm) {
         const focal = this.querySelector('select[name="focal_person"]')?.value;
         const section = this.querySelector('select[name="section"]')?.value;
         const type = this.querySelector('input[name="type_of_paper"]')?.value?.trim();
+        const typeOfPaperOther = this.querySelector('input[name="type_of_paper_other"]')?.value?.trim();
         
         if (!title) errors.push('Document title is required.');
         if (!focal) errors.push('Focal person is required.');
         if (!section) errors.push('Section is required.');
         if (!type) errors.push('Type of paper is required.');
+        if (type === 'Others' && !typeOfPaperOther) errors.push('Please specify the type of paper.');
 
         // File size validation (5MB per file)
         const fileInput = this.querySelector('input[name="documents[]"]');
@@ -1537,7 +1562,11 @@ if (uploadForm) {
 
                 document.getElementById('viewSubject').textContent = title || '—';
                 document.getElementById('viewFocal').textContent = focal || '—';
-                document.getElementById('viewTypeOfPaper').textContent = this.dataset.docTypeOfPaper || '—';
+                const paperType = this.dataset.docTypeOfPaper || '';
+                const otherPaperType = this.dataset.docTypeOfPaperOther || '';
+                document.getElementById('viewTypeOfPaper').textContent = paperType === 'Others' && otherPaperType
+                    ? `Others: ${otherPaperType}`
+                    : paperType || '—';
                 document.getElementById('viewLastComment').textContent = lastComment || 'No comments.';
                 document.getElementById('viewCreated').textContent = created || '—';
 
@@ -2016,6 +2045,18 @@ rtpForm?.addEventListener('submit', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     // Type of Paper Combobox
     const typeOfPaperInput = document.querySelector('input[name="type_of_paper"]');
+    const typeOfPaperOtherGroup = document.querySelector('[data-type-of-paper-other-group]');
+    const typeOfPaperOtherInput = document.querySelector('input[name="type_of_paper_other"]');
+
+    function toggleOtherPaperType() {
+        const isOther = typeOfPaperInput?.value.trim() === 'Others';
+        typeOfPaperOtherGroup?.classList.toggle('hidden', !isOther);
+        if (typeOfPaperOtherInput) {
+            typeOfPaperOtherInput.disabled = !isOther;
+            typeOfPaperOtherInput.required = isOther;
+            if (!isOther) typeOfPaperOtherInput.value = '';
+        }
+    }
     
     if (typeOfPaperInput) {
         // Find the parent div and then find button and list
@@ -2039,6 +2080,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const value = e.target.getAttribute('data-value');
                     typeOfPaperInput.value = value;
                     typeOfPaperList.classList.add('hidden');
+                    toggleOtherPaperType();
                 }
             });
             
@@ -2060,6 +2102,8 @@ document.addEventListener('DOMContentLoaded', function() {
             typeOfPaperInput.addEventListener('focus', function() {
                 typeOfPaperList.classList.remove('hidden');
             });
+            typeOfPaperInput.addEventListener('input', toggleOtherPaperType);
+            toggleOtherPaperType();
         }
     }
 });

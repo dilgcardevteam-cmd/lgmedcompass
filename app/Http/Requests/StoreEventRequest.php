@@ -37,11 +37,24 @@ class StoreEventRequest extends FormRequest
                 'exclude_if:type,leave',
             ],
             'focal_person_id' => [
+                'exclude_if:type,official_business',
                 'nullable',
                 'exists:users,id',
                 'required_if:type,leave',
                 'required_if:type,offsite',
+            ],
+            'focal_person_ids' => [
+                'exclude_unless:type,official_business',
                 'required_if:type,official_business',
+                'array',
+                'min:1',
+            ],
+            'focal_person_ids.*' => [
+                'exclude_unless:type,official_business',
+                'required',
+                'integer',
+                'distinct',
+                'exists:users,id',
             ],
 
         ];
@@ -72,6 +85,9 @@ class StoreEventRequest extends FormRequest
             'section_id.required' => 'Please select a section.',
             'location.required' => 'Please provide a location for this calendar entry.',
             'focal_person_id.exists' => 'Selected focal person does not exist.',
+            'focal_person_ids.required' => 'Select at least one focal person.',
+            'focal_person_ids.min' => 'Select at least one focal person.',
+            'focal_person_ids.*.exists' => 'A selected focal person does not exist.',
         ];
     }
 }

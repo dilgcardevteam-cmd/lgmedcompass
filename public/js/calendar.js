@@ -58,7 +58,7 @@
     window.showErrors = function(errors, form) {
         clearErrors(form);
         for (const [field, messages] of Object.entries(errors)) {
-            const input = form.querySelector(`[name="${field}"]`);
+            const input = form.querySelector(`[name="${field}"], [name="${field}[]"]`);
             if (!input) continue;
             input.classList.add("input-error");
             const errorMsg = document.createElement("p");
@@ -66,7 +66,9 @@
             errorMsg.innerText = messages[0];
             // Insert after the input's container (depends on structure)
             const row = input.closest(".calendar-modal-row");
-            if (row) row.appendChild(errorMsg);
+            const focalPersonOptions = input.closest("[data-focal-person-options]");
+            if (focalPersonOptions) focalPersonOptions.after(errorMsg);
+            else if (row) row.appendChild(errorMsg);
             else input.parentNode.appendChild(errorMsg);
         }
     };
@@ -105,7 +107,25 @@
                 modal.querySelector("#viewLocation").textContent = event.location || "No Location Provided";
                 modal.querySelector("#viewLink").innerHTML = event.link ? `<a href="${event.link}" target="_blank">${event.link}</a>` : "No Link Attached";
                 modal.querySelector("#viewNotes").textContent = event.notes || "No Notes Provided";
-                modal.querySelector("#viewFocalPerson").textContent = event.focal_person || "No Focal Person Provided";
+                const focalPersonNames = Array.isArray(event.focal_person_names)
+                    ? event.focal_person_names
+                    : (event.focal_person ? [event.focal_person] : []);
+                const focalPersonRow = modal.querySelector("#rowFocalPerson");
+                const focalPersonList = modal.querySelector("#viewFocalPerson");
+                focalPersonRow?.classList.toggle("has-multiple-focal-persons", focalPersonNames.length > 1);
+                if (focalPersonList) {
+                    focalPersonList.replaceChildren();
+                    if (focalPersonNames.length === 0) {
+                        focalPersonList.textContent = "No Focal Person Provided";
+                    } else {
+                        focalPersonNames.forEach(name => {
+                            const person = document.createElement("span");
+                            person.className = "calendar-event-focal-person-name";
+                            person.textContent = name;
+                            focalPersonList.appendChild(person);
+                        });
+                    }
+                }
                 modal.querySelector("#viewCreatedBy").textContent = event.created_by || "No Creator Information";
 
                 // Extended props (for layout / delete/edit buttons)
@@ -231,13 +251,59 @@
             const title = modal.querySelector(".calendar-modal-title");
             const submitButton = form.querySelector(".calendar-modal-submit-btn");
             const typeSelect = form.querySelector("[data-create-event-type]");
+            const singleFocalPerson = form.querySelector("[data-single-focal-person]");
+            const multipleFocalPerson = form.querySelector("[data-multiple-focal-person]");
+            const focalPersonSelect = form.querySelector('[name="focal_person_id"]');
+            const focalPersonCheckboxes = form.querySelectorAll('[name="focal_person_ids[]"]');
+            const isOfficialBusiness = type === "official_business";
 
             if (typeInput) typeInput.value = type;
             form.dataset.type = type;
             if (typeSelect) typeSelect.value = type;
             if (title) title.textContent = settings.title;
             if (submitButton) submitButton.textContent = settings.submit;
+            if (singleFocalPerson) singleFocalPerson.classList.toggle("hidden", isOfficialBusiness);
+            if (multipleFocalPerson) multipleFocalPerson.classList.toggle("hidden", !isOfficialBusiness);
+            if (focalPersonSelect) {
+                focalPersonSelect.disabled = isOfficialBusiness;
+                focalPersonSelect.required = !isOfficialBusiness;
+            }
+            focalPersonCheckboxes.forEach(checkbox => {
+                checkbox.disabled = !isOfficialBusiness;
+            });
         }
+
+        function filterFocalPersons(form) {
+            const searchInput = form.querySelector("[data-focal-person-search]");
+            const options = form.querySelector("[data-focal-person-options]");
+            const results = form.querySelector("[data-focal-person-search-results]");
+            if (!searchInput || !options) return;
+
+            const query = searchInput.value.trim().toLocaleLowerCase();
+            let visibleCount = 0;
+
+            options.querySelectorAll(".calendar-focal-person-option").forEach(option => {
+                const searchableText = option.dataset.searchText || option.textContent;
+                const matches = searchableText.toLocaleLowerCase().includes(query);
+                option.classList.toggle("hidden", !matches);
+                if (matches) visibleCount++;
+            });
+
+            if (results) {
+                results.textContent = visibleCount === 0
+                    ? "No focal persons found."
+                    : `${visibleCount} ${visibleCount === 1 ? "person" : "people"} found`;
+            }
+        }
+
+        document.querySelectorAll("[data-focal-person-search]").forEach(searchInput => {
+            const form = searchInput.closest("form");
+            if (!form) return;
+
+            searchInput.addEventListener("input", () => filterFocalPersons(form));
+            form.addEventListener("reset", () => requestAnimationFrame(() => filterFocalPersons(form)));
+            filterFocalPersons(form);
+        });
 
         function openCreateForm(type = "event", date = null) {
             const modalId = modalByCreateType[type] || modalByCreateType.event;

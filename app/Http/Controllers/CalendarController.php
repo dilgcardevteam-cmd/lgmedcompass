@@ -31,7 +31,7 @@ class CalendarController extends Controller
         $user = auth()->user();
 
         $events = Event::visibleTo($user)
-            ->with(['section', 'focalPerson', 'user'])
+            ->with(['section', 'focalPerson', 'focalPersons', 'user'])
             ->latest()
             ->get()
             ->map(function ($event) {
@@ -69,7 +69,7 @@ class CalendarController extends Controller
                     'notes' => $event->notes,
                     'visibility_type' => $event->visibility_type,
                     'section' => $event->section?->name,
-                    'focal_person' => $event->focalPerson?->name,
+                    'focal_person' => $event->focalPersonNames(),
                     'created_by' => $event->user?->name,
                 ];
             });
@@ -84,6 +84,9 @@ class CalendarController extends Controller
 
         $sectionId = null;
         $focalPersonId = null;
+        $focalPersonIds = $type === 'official_business'
+            ? array_values(array_unique($request->input('focal_person_ids', [])))
+            : array_values(array_filter([$request->input('focal_person_id')]));
 
         /*
         |--------------------------------------------------------------------------
@@ -102,7 +105,7 @@ class CalendarController extends Controller
                 break;
 
             case 'leave':
-                $focalPersonId = $request->focal_person_id;
+                $focalPersonId = $focalPersonIds[0] ?? null;
 
                 // Auto-assign section from selected user
                 $sectionId = User::findOrFail($focalPersonId)->section_id;
@@ -114,7 +117,7 @@ class CalendarController extends Controller
             case 'offsite':
             case 'official_business':
 
-                $focalPersonId = $request->focal_person_id;
+                $focalPersonId = $focalPersonIds[0] ?? null;
 
                 // Auto-assign section from selected user
                 $sectionId = User::findOrFail($focalPersonId)->section_id;
@@ -172,10 +175,11 @@ class CalendarController extends Controller
             'focal_person_id' => $focalPersonId,
             'user_id' => auth()->id(),
         ]);
+        $event->focalPersons()->sync($focalPersonIds);
 
         \Log::info('Store request data:', $request->all());
 
-        return response()->json($event->load('section'), 201);
+        return response()->json($event->load(['section', 'focalPersons']), 201);
     }
 
     public function todayEvents()
@@ -191,7 +195,7 @@ class CalendarController extends Controller
         $todayEvents = Event::visibleTo($user)
             ->whereDate('start_date', '<=', $today)
             ->whereDate('end_date', '>=', $today)
-            ->with(['section', 'focalPerson'])
+            ->with(['section', 'focalPerson', 'focalPersons'])
             ->get();
 
         // Get tomorrow's events (excluding those already in today)
@@ -199,7 +203,7 @@ class CalendarController extends Controller
             ->whereDate('start_date', '<=', $endOfTomorrow)
             ->whereDate('end_date', '>=', $tomorrow)
             ->whereNotIn('id', $todayEvents->pluck('id'))
-            ->with(['section', 'focalPerson'])
+            ->with(['section', 'focalPerson', 'focalPersons'])
             ->get();
 
         // Format today's events
@@ -210,12 +214,13 @@ class CalendarController extends Controller
             $timeDisplay = $isAllDay ? 'All day' : $start->format('g:i A').' - '.$end->format('g:i A');
 
             // Determine if this event is specifically for the current user as focal person
-            $isFocalPerson = $event->focal_person_id === $user->id;
+            $isFocalPerson = $event->focal_person_id === $user->id
+                || $event->focalPersons->contains('id', $user->id);
 
             // Determine the label
             $label = null;
-            if ($isFocalPerson && $event->focalPerson) {
-                $label = 'For: '.$event->focalPerson->name;
+            if ($isFocalPerson) {
+                $label = 'For: '.$user->name;
             } elseif ($event->section) {
                 $label = $event->section->name;
             }
@@ -231,7 +236,7 @@ class CalendarController extends Controller
                 'url' => route('calendar.index').'?event='.$event->id,
                 'is_tomorrow' => false,
                 'is_focal_person' => $isFocalPerson,
-                'focal_person_name' => $event->focalPerson?->name,
+                'focal_person_name' => $isFocalPerson ? $user->name : $event->focalPersonNames(),
             ]);
         }
 
@@ -243,12 +248,13 @@ class CalendarController extends Controller
             $timeDisplay = $isAllDay ? 'All day' : $start->format('g:i A').' - '.$end->format('g:i A');
 
             // Determine if this event is specifically for the current user as focal person
-            $isFocalPerson = $event->focal_person_id === $user->id;
+            $isFocalPerson = $event->focal_person_id === $user->id
+                || $event->focalPersons->contains('id', $user->id);
 
             // Determine the label
             $label = null;
-            if ($isFocalPerson && $event->focalPerson) {
-                $label = 'For: '.$event->focalPerson->name;
+            if ($isFocalPerson) {
+                $label = 'For: '.$user->name;
             } elseif ($event->section) {
                 $label = $event->section->name;
             }
@@ -264,7 +270,7 @@ class CalendarController extends Controller
                 'url' => route('calendar.index').'?event='.$event->id,
                 'is_tomorrow' => true,
                 'is_focal_person' => $isFocalPerson,
-                'focal_person_name' => $event->focalPerson?->name,
+                'focal_person_name' => $isFocalPerson ? $user->name : $event->focalPersonNames(),
             ]);
         }
 
@@ -315,7 +321,7 @@ class CalendarController extends Controller
 
     public function show(Event $event)
     {
-        $event->load(['user', 'section', 'focalPerson']);
+        $event->load(['user', 'section', 'focalPerson', 'focalPersons']);
 
         $start = $event->start_date;
         $end = $event->end_date;
@@ -347,8 +353,10 @@ class CalendarController extends Controller
             'location' => $event->location,
             'link' => $event->link,
             'notes' => $event->notes,
-            'focal_person' => $event->focalPerson?->name,
+            'focal_person' => $event->focalPersonNames(),
+            'focal_person_names' => $event->focalPersonNameList(),
             'focal_person_id' => $event->focal_person_id,
+            'focal_person_ids' => $event->focalPersonIds(),
             'created_by' => $event->user?->name,
             'visibility_type' => $event->visibility_type,
             'section_id' => $event->section_id,
@@ -383,15 +391,23 @@ class CalendarController extends Controller
             'end_date' => $request->end_date,
             'focal_person_id' => $request->focal_person_id,
         ]);
-        // Add validation
-        $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',
             'notes' => 'nullable|string',
             'start_date' => 'required',
             'end_date' => 'required',
-        ]);
+        ];
+
+        if ($event->type === 'official_business') {
+            $rules['focal_person_ids'] = ['required', 'array', 'min:1'];
+            $rules['focal_person_ids.*'] = ['required', 'integer', 'distinct', 'exists:users,id'];
+        } else {
+            $rules['focal_person_id'] = ['nullable', 'integer', 'exists:users,id'];
+        }
+
+        $validated = $request->validate($rules);
 
         $start = $request->start_date;
         $end = $request->end_date;
@@ -417,7 +433,10 @@ class CalendarController extends Controller
         $type = $event->type;
 
         $sectionId = $request->section_id;
-        $focalPersonId = $request->focal_person_id;
+        $focalPersonIds = $type === 'official_business'
+            ? array_values(array_unique($validated['focal_person_ids']))
+            : array_values(array_filter([$validated['focal_person_id'] ?? null]));
+        $focalPersonId = $focalPersonIds[0] ?? null;
         $visibilityType = $request->visibility_type;
 
         switch ($type) {
@@ -432,7 +451,7 @@ class CalendarController extends Controller
             case 'offsite':
             case 'official_business':
 
-                $focalPersonId = $request->focal_person_id;
+                $focalPersonId = $focalPersonIds[0] ?? null;
 
                 if ($focalPersonId) {
                     $sectionId = User::findOrFail($focalPersonId)->section_id;
@@ -462,6 +481,7 @@ class CalendarController extends Controller
             'section_id' => $sectionId,
             'focal_person_id' => $focalPersonId,
         ]);
+        $event->focalPersons()->sync($focalPersonIds);
 
         return response()->json(['success' => true]);
     }

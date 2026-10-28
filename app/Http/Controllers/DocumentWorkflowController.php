@@ -61,6 +61,7 @@ class DocumentWorkflowController extends Controller
             'subject_title' => 'required|string|max:255',
             'focal_person' => 'required|string|max:255',
             'type_of_paper' => 'required|string|max:255',
+            'type_of_paper_other' => 'required_if:type_of_paper,Others|nullable|string|max:255',
             'documents.*' => 'nullable|file|mimes:pdf|max:5120',
             'document_link' => 'nullable|url',
             'remarks' => 'nullable|string',
@@ -78,6 +79,9 @@ class DocumentWorkflowController extends Controller
             'subject_title' => $request->subject_title,
             'focal_person' => $request->focal_person,
             'type_of_paper' => $request->type_of_paper,
+            'type_of_paper_other' => $request->type_of_paper === 'Others'
+                ? $request->type_of_paper_other
+                : null,
             'section' => $request->section,
             'document_link' => $request->document_link,
             'remarks' => $request->remarks,

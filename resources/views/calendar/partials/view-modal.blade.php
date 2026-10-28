@@ -76,9 +76,9 @@
                     <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-50">
                         <x-heroicon-o-user class="w-5 h-5"/>
                     </div>
-                    <div class="truncate">
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Focal Person</p>
-                        <p id="viewFocalPerson" class="text-sm font-semibold text-gray-800 truncate"></p>
+                    <div class="calendar-event-focal-person-content">
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Focal Person(s)</p>
+                        <div id="viewFocalPerson" class="calendar-event-focal-person-list"></div>
                     </div>
                 </div>
             </div>
@@ -225,7 +225,7 @@ function escapeHtml(str) {
 }
 
 /* =========================================================
-   OPEN ADD MODAL (unchanged)
+   OPEN ADD MODAL
 ========================================================= */
 function openAddModal(type) {
     const map = { event: "eventModal", holiday: "holidayModal", leave: "leaveModal", offsite: "offsiteModal", official_business: "offsiteModal" };
@@ -237,6 +237,17 @@ function openAddModal(type) {
         form.querySelector("[data-create-type-select-wrapper]")?.classList.remove("hidden");
         const typeInput = form.querySelector('[name="type"]');
         if (typeInput) typeInput.value = type;
+        const isOfficialBusiness = type === "official_business";
+        form.querySelector("[data-single-focal-person]")?.classList.toggle("hidden", isOfficialBusiness);
+        form.querySelector("[data-multiple-focal-person]")?.classList.toggle("hidden", !isOfficialBusiness);
+        const focalPersonSelect = form.querySelector('[name="focal_person_id"]');
+        form.querySelectorAll('[name="focal_person_ids[]"]').forEach(checkbox => {
+            checkbox.disabled = !isOfficialBusiness;
+        });
+        if (focalPersonSelect) {
+            focalPersonSelect.disabled = isOfficialBusiness;
+            focalPersonSelect.required = !isOfficialBusiness;
+        }
     }
     if (typeSelect) typeSelect.value = type;
 
@@ -458,6 +469,19 @@ document.getElementById("editEventBtn").addEventListener("click", async function
         
         // ---------- Handle Focal Person Selection ----------
         const focalPersonSelect = form.querySelector("[name='focal_person_id']");
+        const focalPersonCheckboxes = form.querySelectorAll("[name='focal_person_ids[]']");
+        const singleFocalPerson = form.querySelector("[data-single-focal-person]");
+        const multipleFocalPerson = form.querySelector("[data-multiple-focal-person]");
+        const isOfficialBusiness = event.type === "official_business";
+        if (singleFocalPerson) singleFocalPerson.classList.toggle("hidden", isOfficialBusiness);
+        if (multipleFocalPerson) multipleFocalPerson.classList.toggle("hidden", !isOfficialBusiness);
+        focalPersonCheckboxes.forEach(checkbox => {
+            checkbox.disabled = !isOfficialBusiness;
+        });
+        if (focalPersonSelect) {
+            focalPersonSelect.disabled = isOfficialBusiness;
+            focalPersonSelect.required = !isOfficialBusiness;
+        }
         if (focalPersonSelect) {
             // Populate dropdown if empty
             if (focalPersonSelect.options.length <= 1 && window.usersData) {
@@ -477,6 +501,10 @@ document.getElementById("editEventBtn").addEventListener("click", async function
             // Trigger change event to update section if needed
             focalPersonSelect.dispatchEvent(new Event("change"));
         }
+        const selectedFocalPersonIds = event.focal_person_ids || (event.focal_person_id ? [event.focal_person_id] : []);
+        focalPersonCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectedFocalPersonIds.map(String).includes(checkbox.value);
+        });
         
         // ---------- Handle Section Selection ----------
         const sectionSelect = form.querySelector("[name='section_id']");
@@ -554,6 +582,7 @@ document.getElementById("editEventBtn").addEventListener("click", async function
         console.log("Edit form data:", {
             id: id,
             title: form.querySelector("[name='title']")?.value,
+            focal_person_ids: Array.from(form.querySelectorAll("[name='focal_person_ids[]']:checked"), checkbox => checkbox.value),
             focal_person_id: form.querySelector("[name='focal_person_id']")?.value,
             start_date: form.querySelector("[name='start_date']")?.value,
             end_date: form.querySelector("[name='end_date']")?.value,

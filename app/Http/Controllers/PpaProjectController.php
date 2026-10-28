@@ -15,6 +15,7 @@ class PpaProjectController extends Controller
         'lgpopscm' => 'Local Government Peace & Order and Public Safety Compliance and Monitoring',
         'ssu' => 'Support Services Unit',
         'dsu' => 'Database & Statistical Unit',
+        'qms' => 'Quality Management System',
     ];
 
     public function index(): View
@@ -39,7 +40,7 @@ class PpaProjectController extends Controller
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get();
-        $allowProjectEditing = auth()->user()->role === 'Admin';
+        $allowProjectEditing = auth()->user()?->role === 'Admin';
 
         return view('ppa.ppa-drive', compact('sectionCode', 'sectionDisplay', 'projects', 'allowProjectEditing'));
     }

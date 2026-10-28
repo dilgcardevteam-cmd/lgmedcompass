@@ -15,6 +15,7 @@ class DocumentProcess extends Model
         'subject_title',
         'focal_person',
         'type_of_paper',
+        'type_of_paper_other',
         'section',
         'document_link',
         'remarks',

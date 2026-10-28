@@ -28,7 +28,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 // Landing pages for divisions (public)
 Route::prefix('landingpage')->name('landingpage.')->group(function () {
-    foreach (['lgrpcs', 'lgpmras', 'lgpopscm', 'ssu', 'dsu'] as $sectionCode) {
+    foreach (['lgrpcs', 'lgpmras', 'lgpopscm', 'ssu', 'dsu', 'qms'] as $sectionCode) {
         Route::get("/{$sectionCode}", [PpaProjectController::class, 'landingPage'])
             ->defaults('sectionCode', $sectionCode)
             ->name($sectionCode);

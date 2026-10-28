@@ -258,7 +258,7 @@
 
     <main class="ppa-page">
         <header class="ppa-header">
-            <a href="{{ route('ppa.index') }}" class="ppa-back" aria-label="Back to PPA sections">
+            <a href="{{ $backUrl ?? route('ppa.index') }}" class="ppa-back" aria-label="Back to PPA sections">
                 <i class="bi bi-chevron-left" aria-hidden="true"></i>
             </a>
             <p>{{ strtoupper($sectionDisplay->code) }}</p>
