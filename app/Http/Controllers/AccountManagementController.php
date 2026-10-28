@@ -7,6 +7,7 @@ use App\Models\Section;
 use App\Models\User;
 use App\Notifications\AccountApproved;
 use App\Notifications\AccountDeclined;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -78,6 +79,21 @@ class AccountManagementController extends Controller
             'selectedSectionNames',
             'pendingUsers'
         ));
+    }
+
+    /**
+     * Display archived user accounts.
+     */
+    public function archiveIndex(): View
+    {
+        $this->authorizeAccess('write');
+
+        $users = User::onlyTrashed()
+            ->with('section')
+            ->orderByDesc('deleted_at')
+            ->paginate(10);
+
+        return view('account-management.archive', compact('users'));
     }
 
     /**
@@ -230,18 +246,38 @@ class AccountManagementController extends Controller
      *
      * ✅ Toast ready: uses 'status' flash.
      */
-    public function restore($id): RedirectResponse
+    public function restore(int $id): RedirectResponse
     {
         $this->authorizeAccess('write');
 
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::onlyTrashed()->findOrFail($id);
+
+        if (User::where('email', $user->email)->exists()) {
+            return back()->withErrors([
+                'account' => 'This account cannot be activated because its email address is already in use.',
+            ]);
+        }
+
         $user->restore();
 
-        return back()->with('status', 'User restored successfully.');
+        return back()->with('status', 'User account activated successfully.');
     }
 
     /**
-     * Soft delete a user.
+     * Permanently delete an archived user account.
+     */
+    public function forceDeleteArchived(int $id): RedirectResponse
+    {
+        $this->authorizeAccess('write');
+
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->forceDelete();
+
+        return back()->with('status', 'Archived user account permanently deleted.');
+    }
+
+    /**
+     * Archive a user account.
      *
      * ✅ Toast ready: uses 'status' flash.
      */
@@ -251,14 +287,19 @@ class AccountManagementController extends Controller
 
         if ((int) $user->id === (int) auth()->id()) {
             return back()->withErrors([
-                'account' => 'You cannot delete your own account.',
+                'account' => 'You cannot archive your own account.',
             ]);
         }
 
-        // Permanently remove the user
-        $user->forceDelete();
+        if ($user->role === 'Admin' && User::where('role', 'Admin')->count() <= 1) {
+            return back()->withErrors([
+                'account' => 'You cannot archive the only remaining admin account.',
+            ]);
+        }
 
-        return back()->with('status', 'User permanently deleted.');
+        $user->delete();
+
+        return back()->with('status', 'User account moved to the archive.');
     }
 
     /**

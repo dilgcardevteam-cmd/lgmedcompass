@@ -100,7 +100,7 @@ test('can demote an admin user when more than one admin exists', function () {
     expect($targetAdmin->fresh()->role)->toBe('Employee');
 });
 
-test('admin can delete another user', function () {
+test('admin can archive another user', function () {
     $admin = User::factory()->create([
         'role' => 'Admin',
     ]);
@@ -110,7 +110,70 @@ test('admin can delete another user', function () {
     $response = $this->actingAs($admin)->delete(route('account-management.destroy', $targetUser));
 
     $response->assertRedirect();
-    $this->assertDatabaseMissing('users', [
+    $this->assertSoftDeleted('users', [
         'id' => $targetUser->id,
     ]);
+});
+
+test('admin can view the user archive and activate an archived account', function () {
+    $admin = User::factory()->create([
+        'role' => 'Admin',
+    ]);
+
+    $archivedUser = User::factory()->create([
+        'role' => 'Employee',
+    ]);
+    $archivedUser->delete();
+
+    $this->actingAs($admin)
+        ->get(route('account-management.archive'))
+        ->assertOk()
+        ->assertSee($archivedUser->email);
+
+    $response = $this->patch(route('account-management.restore', $archivedUser->id));
+
+    $response->assertRedirect();
+    expect($archivedUser->fresh())->not->toBeNull();
+    $this->assertDatabaseHas('users', [
+        'id' => $archivedUser->id,
+        'deleted_at' => null,
+    ]);
+});
+
+test('admin can permanently delete an archived account', function () {
+    $admin = User::factory()->create([
+        'role' => 'Admin',
+    ]);
+
+    $archivedUser = User::factory()->create([
+        'role' => 'Employee',
+    ]);
+    $archivedUser->delete();
+
+    $response = $this->actingAs($admin)->delete(
+        route('account-management.force-delete', $archivedUser->id)
+    );
+
+    $response->assertRedirect();
+    $this->assertDatabaseMissing('users', [
+        'id' => $archivedUser->id,
+    ]);
+});
+
+test('non-admin users cannot view or activate accounts from the archive', function () {
+    $employee = User::factory()->create([
+        'role' => 'Employee',
+    ]);
+
+    $archivedUser = User::factory()->create([
+        'role' => 'Employee',
+    ]);
+    $archivedUser->delete();
+
+    $this->actingAs($employee)
+        ->get(route('account-management.archive'))
+        ->assertForbidden();
+
+    $this->patch(route('account-management.restore', $archivedUser->id))
+        ->assertForbidden();
 });

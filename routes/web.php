@@ -10,10 +10,7 @@ use App\Http\Controllers\DocumentWorkflowController;
 use App\Http\Controllers\DriveController;
 use App\Http\Controllers\PpaProjectController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SectionController;
-use App\Http\Controllers\SectionFileController;
-use App\Http\Controllers\SectionFilePPAController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
@@ -57,48 +54,6 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | STATIC RESOURCE PAGES (accessible to all authenticated users)
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('resources')->name('resources.')->group(function () {
-        $categories = [
-            ['name' => 'Division Chief', 'slug' => 'chief'],
-            ['name' => 'Assistant Division Chief', 'slug' => 'assistant-chief'],
-            ['name' => 'LG Relations & Policy Compliance Section', 'slug' => 'lgrpcs'],
-            ['name' => 'LG Performance Management, Recognition, and Awards Section', 'slug' => 'lgpmras'],
-            ['name' => 'LG Peace, Order & Public Safety Compliance Monitoring', 'slug' => 'lgpopscm'],
-            ['name' => 'Support Services Unit', 'slug' => 'ssu'],
-            ['name' => 'Database & Statistical Unit', 'slug' => 'dsu'],
-            ['name' => 'QMS', 'slug' => 'qms'],
-        ];
-
-        foreach ($categories as $category) {
-            $slug = $category['slug'];
-            Route::get("/$slug", fn () => view("resources.rd-$slug"))->name("rd-$slug");
-        }
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESOURCE API (folders, files, uploads) – write actions blocked by middleware
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('resource')->group(function () {
-        Route::get('/folders/{categorySlug}/{folderId?}', [ResourceController::class, 'folders'])->name('resource.folders');
-        Route::post('/folder', [ResourceController::class, 'createFolder'])->name('resource.folder.create');
-        Route::delete('/folder/{id}', [ResourceController::class, 'deleteFolder'])->name('resource.folder.delete');
-        Route::post('/upload', [ResourceController::class, 'uploadFile'])->name('resource.upload');
-        Route::post('/link', [ResourceController::class, 'addLink'])->name('resource.link.store');
-        Route::delete('/file/{id}', [ResourceController::class, 'deleteFile'])->name('resource.file.delete');
-        Route::put('/folder/{id}', [ResourceController::class, 'renameFolder'])->name('resource.folder.rename');
-        Route::put('/file/{id}', [ResourceController::class, 'renameFile'])->name('resource.file.rename');
-        Route::get('/file/view/{id}', [ResourceController::class, 'viewFile'])->name('resource.file.view');
-    });
-
-    Route::get('/resources/{categorySlug}/{folderId?}', [ResourceController::class, 'showCategory'])->name('resources.category');
-
     Route::middleware(['auth'])->group(function () {
         // PPA routes
         Route::prefix('ppa')->name('ppa.')->group(function () {
@@ -106,20 +61,6 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
             Route::get('/{section}', [PpaProjectController::class, 'showSection'])->name('section');
             Route::get('/', [PpaProjectController::class, 'index'])->name('index');
         });
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROTECTED RESOURCE VIEWS
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/resources', fn () => view('resources'))->name('resources.index');
-    Route::get('/resources/{section}', [SectionFileController::class, 'index'])->name('resources.section');
-    Route::get('/resources/{section}/folder/{id}', [SectionFileController::class, 'openFolder'])->name('resources.folder');
-
-    Route::prefix('resourcesppa')->group(function () {
-        Route::get('/{section}', [SectionFilePPAController::class, 'index'])->name('resourcesppa.section');
-        Route::get('/{section}/folder/{id}', [SectionFilePPAController::class, 'openFolder'])->name('resourcesppa.folder');
     });
 
     /*
@@ -252,6 +193,12 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
     |--------------------------------------------------------------------------
     */
     Route::middleware('Admin')->group(function () {
+        Route::get('/account-management/archive', [AccountManagementController::class, 'archiveIndex'])
+            ->name('account-management.archive');
+        Route::patch('/account-management/{id}/restore', [AccountManagementController::class, 'restore'])
+            ->name('account-management.restore');
+        Route::delete('/account-management/{id}/force-delete', [AccountManagementController::class, 'forceDeleteArchived'])
+            ->name('account-management.force-delete');
         Route::patch('/users/{user}/approve', [AccountManagementController::class, 'approve'])->name('users.approve');
         Route::patch('/users/{user}/decline', [AccountManagementController::class, 'decline'])->name('users.decline');
         Route::patch('/account-management/{user}/update-section', [AccountManagementController::class, 'updateSection']);

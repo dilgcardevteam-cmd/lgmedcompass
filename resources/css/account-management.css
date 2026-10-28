@@ -18,6 +18,11 @@
     flex-wrap: wrap;
 }
 
+.account-archive-action {
+    margin-left: auto;
+    padding-left: 24px;
+}
+
 .filter-field {
     display: flex;
     flex-direction: column;
@@ -164,6 +169,10 @@
     color: #92400e;
     border-bottom: 1px solid #fde68a;
 }
+.user-archive-table .account-table-header,
+.user-archive-table .account-row {
+    grid-template-columns: 1.8fr 2fr 1.5fr 1.2fr 1.3fr;
+}
 .account-row {
     display: grid;
     grid-template-columns: 1.8fr 2fr 1.5fr 1.2fr 1fr;
@@ -205,7 +214,14 @@
     justify-content: center;
     align-items: center;
 }
-.edit-row-btn, .delete-row-btn, .save-row-btn, .cancel-row-btn {
+.action-buttons-wrapper form {
+    display: flex;
+    flex: 0 0 auto;
+}
+.action-buttons-wrapper button {
+    white-space: nowrap;
+}
+.edit-row-btn, .delete-row-btn, .activate-row-btn, .save-row-btn, .cancel-row-btn {
     background: none;
     border: none;
     font-size: 0.85rem;
@@ -221,6 +237,8 @@
 .edit-row-btn:hover { background: #fef3c7; }
 .delete-row-btn { color: #dc2626; background: #fef2f2; }
 .delete-row-btn:hover { background: #fee2e2; }
+.user-archive-table .activate-row-btn { color: #059669; background: #ecfdf5; }
+.user-archive-table .activate-row-btn:hover { background: #d1fae5; }
 .save-row-btn { background: #10b981; color: white; padding: 5px 14px; }
 .save-row-btn:hover { background: #059669; }
 .cancel-row-btn { background: #6b7280; color: white; padding: 5px 14px; }
@@ -346,6 +364,7 @@
         color: #374151;
     }
     .action-buttons-wrapper { justify-content: flex-end; }
+    .account-archive-action { align-self: flex-end; margin-left: 0; padding-left: 0; }
     .edit-section-select, .edit-role-select { width: auto; flex: 1; }
     .account-filter-bar { flex-direction: column; align-items: stretch; }
 }

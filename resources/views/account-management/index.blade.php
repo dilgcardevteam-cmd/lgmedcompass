@@ -63,7 +63,9 @@ setTimeout(() => {
 
     <div class="mx-auto max-w-7xl px-4 py-8">
         <div class="account-card">
-            <h1 class="mb-6 text-3xl font-bold text-black">Account Management</h1>
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <h1 class="text-3xl font-bold text-black">Account Management</h1>
+            </div>
 
             <!-- Filter Bar -->
             <form method="GET" action="{{ route('account-management.index') }}" class="account-filter-bar" id="filterForm">
@@ -148,6 +150,15 @@ setTimeout(() => {
                         </div>
                     </div>
                 </div>
+
+                @if(auth()->user()->role === 'Admin')
+                    <div class="account-archive-action">
+                        <a href="{{ route('account-management.archive') }}" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 font-semibold text-amber-800 no-underline transition hover:bg-amber-100">
+                            <i class="bi bi-archive"></i>
+                            User Archive
+                        </a>
+                    </div>
+                @endif
             </form>
 
             <!-- Toast messages -->
@@ -223,7 +234,7 @@ setTimeout(() => {
                                     @if(auth()->id() !== $managedUser->id)
                                         <form method="POST" action="{{ route('account-management.destroy', $managedUser) }}" class="delete-user-form" data-user-name="{{ $managedUser->first_name }} {{ $managedUser->last_name }}">
                                             @csrf @method('DELETE')
-                                            <button type="button" class="delete-row-btn" title="Delete User"><i class="bi bi-trash3"></i> Delete</button>
+                                            <button type="button" class="delete-row-btn" title="Archive User"><i class="bi bi-archive"></i> Archive</button>
                                         </form>
                                     @endif
                                 </div>
@@ -247,16 +258,16 @@ setTimeout(() => {
 <div class="modal" id="confirmModal">
     <div class="modal-content">
         <div class="modal-header">
-            <span id="confirmModalTitle">Confirm Delete</span>
+            <span id="confirmModalTitle">Confirm Archive</span>
             <i class="bi bi-x-lg" onclick="closeConfirmModal()"></i>
         </div>
         <div class="modal-body">
-            <p id="confirmModalMessage">Are you sure you want to delete this item?</p>
-            <p id="confirmModalWarning" style="color: #ef4444; font-size: 0.85rem;">This action cannot be undone.</p>
+            <p id="confirmModalMessage">Are you sure you want to archive this item?</p>
+            <p id="confirmModalWarning" style="color: #92400e; font-size: 0.85rem;">The account will be deactivated and can be activated again from the user archive.</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn-gold" onclick="closeConfirmModal()">Cancel</button>
-            <button type="button" class="btn-primary" id="confirmModalBtn">Delete</button>
+            <button type="button" class="btn-primary" id="confirmModalBtn">Archive</button>
         </div>
     </div>
 </div>

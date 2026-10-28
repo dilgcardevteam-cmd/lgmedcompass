@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function () {
     attachEditListeners();
 
     // ================================
-    // USER DELETION & DECLINE CONFIRMATION
+    // USER ARCHIVING & DECLINE CONFIRMATION
     // ================================
     document.querySelectorAll('.delete-user-form').forEach(form => {
         const btn = form.querySelector('.delete-row-btn');
@@ -519,10 +519,10 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const userName = form.dataset.userName || 'this user';
             const confirmed = await showConfirmModal({
-                title: 'Confirm Delete',
-                message: `Are you sure you want to delete "${userName}"?`,
-                confirmText: 'Delete',
-                warning: 'This action cannot be undone.'
+                title: 'Confirm Archive',
+                message: `Are you sure you want to archive "${userName}"?`,
+                confirmText: 'Archive',
+                warning: 'This account will be deactivated. You can activate it again from the user archive.'
             });
             if (confirmed) form.submit();
         });

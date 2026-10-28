@@ -582,9 +582,6 @@
             <a class="item {{ request()->routeIs('ppa.*') ? 'active' : '' }}" href="{{ route('ppa.index') }}" data-title="PPAs">
                 <i class="uil uil-chart-growth"></i><span>PPAs</span>
             </a>
-            <a class="item {{ request()->routeIs('resources.*') ? 'active' : '' }}" href="{{ route('resources.index') }}" data-title="Resources & Downloads">
-                <i class="uil uil-book-open"></i><span>Resources & Downloads</span>
-            </a>
             <a class="item {{ request()->routeIs('calendar.*') ? 'active' : '' }}" href="{{ route('calendar.index') }}" data-title="Calendar">
                 <i class="uil uil-calendar-alt"></i><span>Calendar</span>
             </a>
