@@ -159,6 +159,12 @@
             min-width: calc(var(--sidebar-collapsed-width) - 28px);
             display: flex; align-items: center; justify-content: center;
         }
+        .item .item-logo {
+            width: 20px;
+            height: 20px;
+            min-width: calc(var(--sidebar-collapsed-width) - 28px);
+            object-fit: contain;
+        }
         .item span { font-size: 14px; font-weight: 600; opacity: 0; margin-left: 4px; transition: opacity 0.2s; }
         body.sidebar-open .item span { opacity: 1; }
         .item:hover { background: var(--brand-light); color: var(--brand-dark); }
@@ -175,6 +181,10 @@
             padding: 6px 12px; border-radius: 6px; font-size: 12px;
             white-space: nowrap; pointer-events: none;
             z-index: 1600;
+        }
+        .sidebar-divider {
+            margin: 12px 28px;
+            border-top: 1px solid rgba(15, 23, 42, 0.12);
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -590,6 +600,16 @@
                 <i class="uil uil-shield-check"></i><span>Accounts</span>
             </a>
             @endcan
+        </div>
+        <div class="sidebar-divider" role="separator" aria-orientation="horizontal"></div>
+        <div class="menu">
+            <a class="item" href="https://intranet.dilg.gov.ph/user/login" target="_blank" rel="noopener noreferrer" data-title="DILG Intranet">
+                <img class="item-logo" src="{{ asset('images/dilg-logo.png') }}" alt="">
+                <span>DILG Intranet</span>
+            </a>
+            <a class="item" href="https://drive.google.com/drive/u/1/folders/1JN-8jz58sP3WFfKA058mxNDqVyb0mXAy" target="_blank" rel="noopener noreferrer" data-title="User Manual">
+                <i class="uil uil-book-open"></i><span>User Manual</span>
+            </a>
         </div>
     </aside>
 
