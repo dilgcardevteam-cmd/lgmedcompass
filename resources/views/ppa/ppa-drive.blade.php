@@ -149,8 +149,6 @@
             line-height: 1.6;
         }
 
-        .report-tile:hover .project-details,
-        .report-tile:focus-within .project-details,
         .report-tile[open] .project-details {
             display: flex;
         }

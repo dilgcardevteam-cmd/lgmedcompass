@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Event;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreEventRequest extends FormRequest
 {
@@ -38,9 +40,9 @@ class StoreEventRequest extends FormRequest
             ],
             'focal_person_id' => [
                 'exclude_if:type,official_business',
+                'exclude_if:type,leave',
                 'nullable',
                 'exists:users,id',
-                'required_if:type,leave',
                 'required_if:type,offsite',
             ],
             'focal_person_ids' => [
@@ -58,6 +60,25 @@ class StoreEventRequest extends FormRequest
             ],
 
         ];
+
+        if ($this->type === 'leave') {
+            $rules['leave_type'] = ['required', 'string', Rule::in(Event::LEAVE_TYPES)];
+            $rules['leave_type_other'] = [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf($this->input('leave_type') === 'Others, specify'),
+            ];
+            $rules['focal_person_ids'] = ['required', 'array', 'min:1'];
+            $rules['focal_person_ids.*'] = ['required', 'integer', 'distinct', 'exists:users,id'];
+        } elseif ($this->type === 'official_business') {
+            $rules['focal_person_ids'] = [
+                'required',
+                'array',
+                'min:1',
+            ];
+            $rules['focal_person_ids.*'] = ['required', 'integer', 'distinct', 'exists:users,id'];
+        }
 
         // Conditional rule for location
         if (in_array($this->type, ['offsite', 'official_business'], true)) {
@@ -85,6 +106,9 @@ class StoreEventRequest extends FormRequest
             'section_id.required' => 'Please select a section.',
             'location.required' => 'Please provide a location for this calendar entry.',
             'focal_person_id.exists' => 'Selected focal person does not exist.',
+            'leave_type.required' => 'Please select a type of leave.',
+            'leave_type.in' => 'Please select a valid type of leave.',
+            'leave_type_other.required' => 'Please specify the type of leave.',
             'focal_person_ids.required' => 'Select at least one focal person.',
             'focal_person_ids.min' => 'Select at least one focal person.',
             'focal_person_ids.*.exists' => 'A selected focal person does not exist.',

@@ -369,6 +369,30 @@
     cursor: pointer;
 }
 
+.calendar-modal-submit-btn:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
+.calendar-modal-submit-btn.is-saving::before {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    content: "";
+    vertical-align: -2px;
+    animation: calendar-save-spin 0.7s linear infinite;
+}
+
+@keyframes calendar-save-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 @media (max-width: 1200px) {
     .calendar-modal-title {
         font-size: 34px;

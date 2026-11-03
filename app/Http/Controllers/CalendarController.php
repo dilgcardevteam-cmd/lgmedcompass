@@ -8,6 +8,7 @@ use App\Models\Section;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CalendarController extends Controller
@@ -64,6 +65,8 @@ class CalendarController extends Controller
                     'color' => $event->calendar_color,
 
                     'type' => $event->type,
+                    'leave_type' => $event->leave_type,
+                    'leave_type_other' => $event->leave_type_other,
                     'location' => $event->location,
                     'link' => $event->link,
                     'notes' => $event->notes,
@@ -84,7 +87,7 @@ class CalendarController extends Controller
 
         $sectionId = null;
         $focalPersonId = null;
-        $focalPersonIds = $type === 'official_business'
+        $focalPersonIds = in_array($type, ['leave', 'official_business'], true)
             ? array_values(array_unique($request->input('focal_person_ids', [])))
             : array_values(array_filter([$request->input('focal_person_id')]));
 
@@ -165,6 +168,10 @@ class CalendarController extends Controller
         $event = Event::create([
             'title' => $request->title,
             'type' => $type,
+            'leave_type' => $type === 'leave' ? $request->leave_type : null,
+            'leave_type_other' => $type === 'leave' && $request->leave_type === 'Others, specify'
+                ? $request->leave_type_other
+                : null,
             'link' => $request->link,
             'location' => $request->location,
             'notes' => $request->notes,
@@ -176,8 +183,6 @@ class CalendarController extends Controller
             'user_id' => auth()->id(),
         ]);
         $event->focalPersons()->sync($focalPersonIds);
-
-        \Log::info('Store request data:', $request->all());
 
         return response()->json($event->load(['section', 'focalPersons']), 201);
     }
@@ -350,6 +355,8 @@ class CalendarController extends Controller
             'id' => $event->id,
             'title' => $event->title,
             'type' => $event->type,
+            'leave_type' => $event->leave_type,
+            'leave_type_other' => $event->leave_type_other,
             'location' => $event->location,
             'link' => $event->link,
             'notes' => $event->notes,
@@ -400,11 +407,21 @@ class CalendarController extends Controller
             'end_date' => 'required',
         ];
 
-        if ($event->type === 'official_business') {
+        if (in_array($event->type, ['leave', 'official_business'], true)) {
             $rules['focal_person_ids'] = ['required', 'array', 'min:1'];
             $rules['focal_person_ids.*'] = ['required', 'integer', 'distinct', 'exists:users,id'];
         } else {
             $rules['focal_person_id'] = ['nullable', 'integer', 'exists:users,id'];
+        }
+
+        if ($event->type === 'leave') {
+            $rules['leave_type'] = ['required', 'string', Rule::in(Event::LEAVE_TYPES)];
+            $rules['leave_type_other'] = [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf($request->input('leave_type') === 'Others, specify'),
+            ];
         }
 
         $validated = $request->validate($rules);
@@ -433,7 +450,7 @@ class CalendarController extends Controller
         $type = $event->type;
 
         $sectionId = $request->section_id;
-        $focalPersonIds = $type === 'official_business'
+        $focalPersonIds = in_array($type, ['leave', 'official_business'], true)
             ? array_values(array_unique($validated['focal_person_ids']))
             : array_values(array_filter([$validated['focal_person_id'] ?? null]));
         $focalPersonId = $focalPersonIds[0] ?? null;
@@ -472,6 +489,10 @@ class CalendarController extends Controller
 
         $event->update([
             'title' => $request->title,
+            'leave_type' => $type === 'leave' ? $validated['leave_type'] : null,
+            'leave_type_other' => $type === 'leave' && $validated['leave_type'] === 'Others, specify'
+                ? $validated['leave_type_other']
+                : null,
             'location' => $request->location,
             'link' => $request->link,
             'notes' => $request->notes,

@@ -62,6 +62,16 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div id="rowLeaveType" class="hidden flex items-center gap-4 px-6 py-5 rounded-2xl bg-gray-50 border border-gray-100 sm:col-span-2">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-50">
+                        <x-heroicon-o-document-text class="w-5 h-5"/>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Type of Leave</p>
+                        <p id="viewLeaveType" class="text-sm font-semibold text-gray-800"></p>
+                    </div>
+                </div>
+
                 <div id="rowLocation" class="flex items-start gap-4 px-6 py-5 rounded-2xl bg-gray-50 border border-gray-100 sm:col-span-2">
                     <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-50">
                         <x-heroicon-o-map-pin class="w-5 h-5"/>
@@ -237,16 +247,18 @@ function openAddModal(type) {
         form.querySelector("[data-create-type-select-wrapper]")?.classList.remove("hidden");
         const typeInput = form.querySelector('[name="type"]');
         if (typeInput) typeInput.value = type;
-        const isOfficialBusiness = type === "official_business";
-        form.querySelector("[data-single-focal-person]")?.classList.toggle("hidden", isOfficialBusiness);
-        form.querySelector("[data-multiple-focal-person]")?.classList.toggle("hidden", !isOfficialBusiness);
         const focalPersonSelect = form.querySelector('[name="focal_person_id"]');
-        form.querySelectorAll('[name="focal_person_ids[]"]').forEach(checkbox => {
-            checkbox.disabled = !isOfficialBusiness;
+        const focalPersonCheckboxes = form.querySelectorAll('[name="focal_person_ids[]"]');
+        const isMultipleFocalPersonType = ["leave", "official_business"].includes(type)
+            && focalPersonCheckboxes.length > 0;
+        form.querySelector("[data-single-focal-person]")?.classList.toggle("hidden", isMultipleFocalPersonType);
+        form.querySelector("[data-multiple-focal-person]")?.classList.toggle("hidden", !isMultipleFocalPersonType);
+        focalPersonCheckboxes.forEach(checkbox => {
+            checkbox.disabled = !isMultipleFocalPersonType;
         });
         if (focalPersonSelect) {
-            focalPersonSelect.disabled = isOfficialBusiness;
-            focalPersonSelect.required = !isOfficialBusiness;
+            focalPersonSelect.disabled = isMultipleFocalPersonType;
+            focalPersonSelect.required = !isMultipleFocalPersonType;
         }
     }
     if (typeSelect) typeSelect.value = type;
@@ -332,10 +344,16 @@ function formatEventDate(start, end) {
 }
 
 function applyViewModalLayout(type) {
-    const rows = { link: document.getElementById("rowLink"), location: document.getElementById("rowLocation"), focal: document.getElementById("rowFocalPerson"), notes: document.getElementById("rowNotes") };
+    const rows = {
+        link: document.getElementById("rowLink"),
+        location: document.getElementById("rowLocation"),
+        leaveType: document.getElementById("rowLeaveType"),
+        focal: document.getElementById("rowFocalPerson"),
+        notes: document.getElementById("rowNotes")
+    };
     Object.values(rows).forEach(row => { if (row) row.style.display = "none"; });
     type = (type || "").toLowerCase();
-    const layout = { event: ["link", "location", "notes"], holiday: ["notes"], leave: ["focal", "notes"], offsite: ["location", "focal", "notes"], official_business: ["location", "focal", "notes"] };
+    const layout = { event: ["link", "location", "notes"], holiday: ["notes"], leave: ["leaveType", "focal", "notes"], offsite: ["location", "focal", "notes"], official_business: ["location", "focal", "notes"] };
     (layout[type] || []).forEach(key => { if (rows[key]) rows[key].style.display = key === "notes" ? "block" : "flex"; });
 }
 
@@ -456,6 +474,9 @@ document.getElementById("editEventBtn").addEventListener("click", async function
         
         setVal("title", event.title);
         setVal("type", event.type);
+        setVal("leave_type", event.leave_type);
+        setVal("leave_type_other", event.leave_type_other);
+        form.querySelector("[data-leave-type]")?.dispatchEvent(new Event("change"));
         setVal("location", event.location || "");
         setVal("link", event.link || "");
         setVal("notes", event.notes || "");
@@ -472,15 +493,15 @@ document.getElementById("editEventBtn").addEventListener("click", async function
         const focalPersonCheckboxes = form.querySelectorAll("[name='focal_person_ids[]']");
         const singleFocalPerson = form.querySelector("[data-single-focal-person]");
         const multipleFocalPerson = form.querySelector("[data-multiple-focal-person]");
-        const isOfficialBusiness = event.type === "official_business";
-        if (singleFocalPerson) singleFocalPerson.classList.toggle("hidden", isOfficialBusiness);
-        if (multipleFocalPerson) multipleFocalPerson.classList.toggle("hidden", !isOfficialBusiness);
+        const isMultipleFocalPersonType = ["leave", "official_business"].includes(event.type);
+        if (singleFocalPerson) singleFocalPerson.classList.toggle("hidden", isMultipleFocalPersonType);
+        if (multipleFocalPerson) multipleFocalPerson.classList.toggle("hidden", !isMultipleFocalPersonType);
         focalPersonCheckboxes.forEach(checkbox => {
-            checkbox.disabled = !isOfficialBusiness;
+            checkbox.disabled = !isMultipleFocalPersonType;
         });
         if (focalPersonSelect) {
-            focalPersonSelect.disabled = isOfficialBusiness;
-            focalPersonSelect.required = !isOfficialBusiness;
+            focalPersonSelect.disabled = isMultipleFocalPersonType;
+            focalPersonSelect.required = !isMultipleFocalPersonType;
         }
         if (focalPersonSelect) {
             // Populate dropdown if empty

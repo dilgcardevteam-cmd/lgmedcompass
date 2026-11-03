@@ -8,9 +8,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Event extends Model
 {
+    public const LEAVE_TYPES = [
+        'Vacation Leave',
+        'Mandatory/Forced Leave',
+        'Sick Leave',
+        'Maternity Leave',
+        'Paternity Leave',
+        'Special Priviledge Leave',
+        'Solo Parent Leave',
+        'Study Leave',
+        '10-Day VAWC Leave',
+        'Rehabilitation Priviledge',
+        'Special Leave Benefits for Women',
+        'Special Emergency (Calamity) Leave',
+        'Adoption Leave',
+        'Wellness Leave',
+        'Others, specify',
+    ];
+
     protected $fillable = [
         'title',
         'type',
+        'leave_type',
+        'leave_type_other',
         'link',
         'location',
         'notes',

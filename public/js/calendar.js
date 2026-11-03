@@ -104,6 +104,14 @@
                 };
                 modal.querySelector("#viewType").textContent = typeLabels[event.type] || event.type || "";
                 modal.querySelector("#viewDate").textContent = formatEventDate(event.start_date, event.end_date);
+                const leaveTypeRow = modal.querySelector("#rowLeaveType");
+                const leaveTypeText = modal.querySelector("#viewLeaveType");
+                if (leaveTypeText) {
+                    leaveTypeText.textContent = event.leave_type === "Others, specify" && event.leave_type_other
+                        ? `${event.leave_type}: ${event.leave_type_other}`
+                        : (event.leave_type || "");
+                }
+                leaveTypeRow?.classList.toggle("hidden", event.type !== "leave");
                 modal.querySelector("#viewLocation").textContent = event.location || "No Location Provided";
                 modal.querySelector("#viewLink").innerHTML = event.link ? `<a href="${event.link}" target="_blank">${event.link}</a>` : "No Link Attached";
                 modal.querySelector("#viewNotes").textContent = event.notes || "No Notes Provided";
@@ -255,23 +263,46 @@
             const multipleFocalPerson = form.querySelector("[data-multiple-focal-person]");
             const focalPersonSelect = form.querySelector('[name="focal_person_id"]');
             const focalPersonCheckboxes = form.querySelectorAll('[name="focal_person_ids[]"]');
-            const isOfficialBusiness = type === "official_business";
+            const isMultipleFocalPersonType = ["leave", "official_business"].includes(type)
+                && focalPersonCheckboxes.length > 0;
 
             if (typeInput) typeInput.value = type;
             form.dataset.type = type;
             if (typeSelect) typeSelect.value = type;
             if (title) title.textContent = settings.title;
             if (submitButton) submitButton.textContent = settings.submit;
-            if (singleFocalPerson) singleFocalPerson.classList.toggle("hidden", isOfficialBusiness);
-            if (multipleFocalPerson) multipleFocalPerson.classList.toggle("hidden", !isOfficialBusiness);
+            if (singleFocalPerson) singleFocalPerson.classList.toggle("hidden", isMultipleFocalPersonType);
+            if (multipleFocalPerson) multipleFocalPerson.classList.toggle("hidden", !isMultipleFocalPersonType);
             if (focalPersonSelect) {
-                focalPersonSelect.disabled = isOfficialBusiness;
-                focalPersonSelect.required = !isOfficialBusiness;
+                focalPersonSelect.disabled = isMultipleFocalPersonType;
+                focalPersonSelect.required = !isMultipleFocalPersonType;
             }
             focalPersonCheckboxes.forEach(checkbox => {
-                checkbox.disabled = !isOfficialBusiness;
+                checkbox.disabled = !isMultipleFocalPersonType;
             });
         }
+
+        function updateLeaveTypeOther(form) {
+            const leaveType = form.querySelector("[data-leave-type]");
+            const wrapper = form.querySelector("[data-leave-type-other-wrapper]");
+            const otherInput = form.querySelector("[data-leave-type-other]");
+            const isOther = leaveType?.value === "Others, specify";
+
+            wrapper?.classList.toggle("hidden", !isOther);
+            if (otherInput) {
+                otherInput.required = isOther;
+                if (!isOther) otherInput.value = "";
+            }
+        }
+
+        document.querySelectorAll("[data-leave-type]").forEach(select => {
+            const form = select.closest("form");
+            if (!form) return;
+
+            select.addEventListener("change", () => updateLeaveTypeOther(form));
+            form.addEventListener("reset", () => requestAnimationFrame(() => updateLeaveTypeOther(form)));
+            updateLeaveTypeOther(form);
+        });
 
         function filterFocalPersons(form) {
             const searchInput = form.querySelector("[data-focal-person-search]");
@@ -312,6 +343,7 @@
             if (!modal || !form) return;
 
             form.reset();
+            updateLeaveTypeOther(form);
             form.removeAttribute("data-editing");
             const methodField = form.querySelector('input[name="_method"]');
             if (methodField) methodField.remove();
@@ -469,6 +501,8 @@
 
             form.addEventListener("submit", async function(event) {
                 event.preventDefault();
+                if (this.dataset.submitting === "true") return;
+
                 window.clearErrors(this);
 
                 // ========== TIME ORDER & EMPTY VALIDATION ==========
@@ -553,16 +587,16 @@
 
                 const formData = new FormData(this);
                 const url = this.action || this.dataset.storeUrl;
+                const submitButton = this.querySelector(".calendar-modal-submit-btn");
+                const originalSubmitText = submitButton?.textContent.trim() || "";
 
-                // Log what we're submitting for debugging
-                console.log("Submitting form data:", {
-                    url: url,
-                    title: formData.get('title'),
-                    start_date: formData.get('start_date'),
-                    end_date: formData.get('end_date'),
-                    focal_person_id: formData.get('focal_person_id'),
-                    isEditing: this.dataset.editing === 'true'
-                });
+                this.dataset.submitting = "true";
+                this.setAttribute("aria-busy", "true");
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.classList.add("is-saving");
+                    submitButton.textContent = "Saving...";
+                }
 
                 try {
                     const isEditing = this.dataset.editing === 'true';
@@ -577,6 +611,15 @@
                         },
                         body: formData
                     });
+
+                    const contentType = response.headers.get("content-type") || "";
+                    if (!contentType.includes("application/json")) {
+                        if (response.redirected) {
+                            throw new Error("Your session may have expired. Refresh the page and sign in again.");
+                        }
+
+                        throw new Error(`The server returned an unexpected response (${response.status}). Please try again.`);
+                    }
 
                     const result = await response.json();
 
@@ -616,13 +659,19 @@
                     
                 } catch (error) {
                     console.error("AJAX submit error:", error);
-                    let errorMsg = "Network error – please check your connection.";
-                    if (error.message) errorMsg += " " + error.message;
-                    
+                    const errorMsg = error.message || "Network error – please check your connection.";
                     if (typeof showToast === "function") {
                         showToast(errorMsg, "error");
                     } else {
                         alert(errorMsg);
+                    }
+                } finally {
+                    delete this.dataset.submitting;
+                    this.removeAttribute("aria-busy");
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.classList.remove("is-saving");
+                        submitButton.textContent = originalSubmitText;
                     }
                 }
             });
