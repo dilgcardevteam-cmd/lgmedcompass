@@ -22,6 +22,7 @@ class UpdatePpaProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:5000'],
             'external_url' => ['nullable', 'url', 'max:2048'],
         ];
@@ -35,6 +36,7 @@ class UpdatePpaProjectRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.required' => 'A project name is required.',
             'description.required' => 'A project description is required.',
             'description.max' => 'The project description may not exceed 5000 characters.',
             'external_url.url' => 'Enter a valid Google Drive link.',

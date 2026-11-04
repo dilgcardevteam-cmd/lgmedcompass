@@ -57,7 +57,9 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
     Route::middleware(['auth'])->group(function () {
         // PPA routes
         Route::prefix('ppa')->name('ppa.')->group(function () {
+            Route::post('/{section}/projects', [PpaProjectController::class, 'storeProject'])->name('project.store');
             Route::put('/project/{project}', [PpaProjectController::class, 'updateProject'])->name('project.update');
+            Route::delete('/project/{project}', [PpaProjectController::class, 'destroyProject'])->name('project.destroy');
             Route::get('/{section}', [PpaProjectController::class, 'showSection'])->name('section');
             Route::get('/', [PpaProjectController::class, 'index'])->name('index');
         });

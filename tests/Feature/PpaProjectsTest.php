@@ -20,6 +20,8 @@ test('public landing and authenticated PPA view use the same project records', f
         ->assertSeeText($project->name)
         ->assertSeeText($project->description)
         ->assertSee($project->external_url)
+        ->assertSee('id="ppaAdminFabToggle"', false)
+        ->assertSee('id="ppaDeleteProjectDialog"', false)
         ->assertSee('Save project details');
 
     $employee = User::factory()->create(['role' => 'Employee']);
@@ -27,6 +29,8 @@ test('public landing and authenticated PPA view use the same project records', f
     $this->actingAs($employee)
         ->get(route('ppa.section', 'lgrpcs'))
         ->assertOk()
+        ->assertDontSee('id="ppaAdminFabToggle"', false)
+        ->assertDontSee('id="ppaDeleteProjectDialog"', false)
         ->assertDontSee('Save project details');
 });
 
@@ -54,12 +58,13 @@ test('QMS projects are available from the public PPA section', function () {
         ->assertSeeTextInOrder($projectNames);
 });
 
-test('admins can update project descriptions and external links', function () {
+test('admins can update project names, descriptions, and external links', function () {
     $admin = User::factory()->create(['role' => 'Admin']);
     $project = PpaProject::query()->where('section_code', 'dsu')->firstOrFail();
 
     $this->actingAs($admin)
         ->put(route('ppa.project.update', $project), [
+            'name' => 'Updated DSU Project',
             'description' => 'Updated project description.',
             'external_url' => 'https://drive.google.com/example',
         ])
@@ -67,8 +72,47 @@ test('admins can update project descriptions and external links', function () {
 
     $updatedProject = $project->fresh();
 
-    expect($updatedProject->description)->toBe('Updated project description.')
+    expect($updatedProject->name)->toBe('Updated DSU Project')
+        ->and($updatedProject->description)->toBe('Updated project description.')
         ->and($updatedProject->external_url)->toBe('https://drive.google.com/example');
+});
+
+test('admins can add a project to a PPA section', function () {
+    $admin = User::factory()->create(['role' => 'Admin']);
+
+    $this->actingAs($admin)
+        ->post(route('ppa.project.store', 'dsu'), [
+            'name' => 'New Data Services Project',
+            'description' => 'A newly added project.',
+            'external_url' => 'https://drive.google.com/new-project',
+        ])
+        ->assertRedirect(route('ppa.section', 'dsu'));
+
+    $project = PpaProject::query()
+        ->where('section_code', 'dsu')
+        ->where('name', 'New Data Services Project')
+        ->firstOrFail();
+
+    expect($project->description)->toBe('A newly added project.')
+        ->and($project->external_url)->toBe('https://drive.google.com/new-project');
+
+    $this->assertDatabaseHas('ppa_projects', [
+        'id' => $project->id,
+        'is_active' => true,
+    ]);
+});
+
+test('admins can permanently delete a project', function () {
+    $admin = User::factory()->create(['role' => 'Admin']);
+    $project = PpaProject::query()->where('section_code', 'dsu')->firstOrFail();
+
+    $this->actingAs($admin)
+        ->delete(route('ppa.project.destroy', $project))
+        ->assertRedirect(route('ppa.section', 'dsu'));
+
+    $this->assertDatabaseMissing('ppa_projects', [
+        'id' => $project->id,
+    ]);
 });
 
 test('employees cannot update project details', function () {
@@ -83,6 +127,29 @@ test('employees cannot update project details', function () {
         ->assertForbidden();
 
     expect($project->fresh()->description)->not->toBe('Should not be saved.');
+});
+
+test('employees cannot add or delete PPA projects', function () {
+    $employee = User::factory()->create(['role' => 'Employee']);
+    $project = PpaProject::query()->where('section_code', 'dsu')->firstOrFail();
+
+    $this->actingAs($employee)
+        ->post(route('ppa.project.store', 'dsu'), [
+            'name' => 'Unauthorized project',
+            'description' => 'Should not be saved.',
+        ])
+        ->assertForbidden();
+
+    $this->delete(route('ppa.project.destroy', $project))
+        ->assertForbidden();
+
+    $this->assertDatabaseMissing('ppa_projects', [
+        'name' => 'Unauthorized project',
+        'section_code' => 'dsu',
+    ]);
+    $this->assertDatabaseHas('ppa_projects', [
+        'id' => $project->id,
+    ]);
 });
 
 test('other authenticated roles cannot update project details', function () {

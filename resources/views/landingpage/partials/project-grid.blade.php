@@ -33,12 +33,11 @@
         -webkit-line-clamp: 3;
     }
 
-    .project-edit-trigger {
+    .project-action-trigger {
         position: absolute;
         z-index: 2;
         top: 28px;
         left: 50%;
-        display: flex;
         width: 80px;
         height: 80px;
         align-items: center;
@@ -49,54 +48,37 @@
         border-radius: 20px;
         background: white;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-        color: var(--accent);
+        color: #1e293b;
         cursor: pointer;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+        display: none;
+        transition: transform 0.2s ease, background-color 0.2s ease;
     }
 
-    .report-tile:hover .project-edit-trigger,
-    .report-tile:focus-within .project-edit-trigger,
-    .project-edit-trigger:focus-visible {
+    .ppa-grid[data-ppa-admin-mode="edit"] .project-action-trigger,
+    .ppa-grid[data-ppa-admin-mode="delete"] .project-action-trigger {
+        display: flex;
         transform: translateX(-50%) scale(1);
-        opacity: 1;
-        pointer-events: auto;
     }
 
-    .project-edit-trigger:hover,
-    .project-edit-trigger:focus-visible {
+    .ppa-grid[data-ppa-admin-mode="delete"] .project-action-trigger {
+        color: #dc2626;
+    }
+
+    .project-action-trigger:hover,
+    .project-action-trigger:focus-visible {
         background: #fffbeb;
     }
 
-    .project-edit-trigger img {
-        width: 50px;
-        height: 50px;
-        object-fit: contain;
-        transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    .project-edit-trigger i {
-        position: absolute;
+    .project-action-trigger i {
         font-size: 30px;
-        opacity: 0;
-        transform: scale(0.75);
-        transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .project-edit-trigger:hover img,
-    .project-edit-trigger:focus-visible img {
-        opacity: 0;
-        transform: scale(0.8);
+    .ppa-grid[data-ppa-admin-mode="edit"] .project-action-trigger i:last-child,
+    .ppa-grid[data-ppa-admin-mode="delete"] .project-action-trigger i:first-child {
+        display: none;
     }
 
-    .project-edit-trigger:hover i,
-    .project-edit-trigger:focus-visible i {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .project-edit-trigger:focus-visible {
+    .project-action-trigger:focus-visible {
         outline: 3px solid var(--accent);
         outline-offset: 4px;
     }
@@ -155,7 +137,7 @@
 </style>
 
 @foreach($projects as $project)
-    <details class="report-tile" name="ppa-projects">
+    <details class="report-tile" name="ppa-projects" @if(($allowProjectEditing ?? false) && old('ppa_action') === 'edit-'.$project->id) open @endif>
         <summary class="project-summary">
             <span class="tile-logo-wrapper">
                 <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
@@ -165,16 +147,25 @@
         </summary>
         @if($allowProjectEditing ?? false)
             <button
-                class="project-edit-trigger"
+                class="project-action-trigger"
                 type="button"
-                aria-label="Edit {{ $project->name }}"
-                aria-controls="project-editor-{{ $project->id }}"
-                aria-expanded="false"
-                title="Edit project details"
+                aria-label="Select action for {{ $project->name }}"
+                title="Select project action"
+                data-project-name="{{ $project->name }}"
             >
-                <img src="https://image2url.com/r2/default/images/1773880295036-5e848f27-e22c-4026-9e98-2013534bf9f2.png" alt="" />
                 <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                <i class="bi bi-trash3-fill" aria-hidden="true"></i>
             </button>
+            <form
+                class="project-delete-form"
+                method="POST"
+                action="{{ route('ppa.project.destroy', $project) }}"
+                hidden
+                data-project-name="{{ $project->name }}"
+            >
+                @csrf
+                @method('DELETE')
+            </form>
         @endif
         <div class="project-details">
             <p>{{ $project->description }}</p>
@@ -184,21 +175,52 @@
                 </a>
             @endif
             @if($allowProjectEditing ?? false)
-                <form class="project-editor" id="project-editor-{{ $project->id }}" method="POST" action="{{ route('ppa.project.update', $project) }}" hidden>
+                <form
+                    class="project-editor"
+                    id="project-editor-{{ $project->id }}"
+                    method="POST"
+                    action="{{ route('ppa.project.update', $project) }}"
+                    @if(old('ppa_action') !== 'edit-'.$project->id) hidden @endif
+                >
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="ppa_action" value="edit-{{ $project->id }}">
+                    <label>
+                        Project name
+                        <input
+                            type="text"
+                            name="name"
+                            value="{{ old('ppa_action') === 'edit-'.$project->id ? old('name', $project->name) : $project->name }}"
+                            maxlength="255"
+                            required
+                        />
+                        @error('name')
+                            @if(old('ppa_action') === 'edit-'.$project->id)
+                                <span role="alert">{{ $message }}</span>
+                            @endif
+                        @enderror
+                    </label>
                     <label>
                         Description
-                        <textarea name="description" required>{{ $project->description }}</textarea>
+                        <textarea name="description" required>{{ old('ppa_action') === 'edit-'.$project->id ? old('description', $project->description) : $project->description }}</textarea>
                         @error('description')
-                            <span role="alert">{{ $message }}</span>
+                            @if(old('ppa_action') === 'edit-'.$project->id)
+                                <span role="alert">{{ $message }}</span>
+                            @endif
                         @enderror
                     </label>
                     <label>
                         Google Drive link
-                        <input type="url" name="external_url" value="{{ $project->external_url }}" placeholder="https://drive.google.com/..." />
+                        <input
+                            type="url"
+                            name="external_url"
+                            value="{{ old('ppa_action') === 'edit-'.$project->id ? old('external_url', $project->external_url) : $project->external_url }}"
+                            placeholder="https://drive.google.com/..."
+                        />
                         @error('external_url')
-                            <span role="alert">{{ $message }}</span>
+                            @if(old('ppa_action') === 'edit-'.$project->id)
+                                <span role="alert">{{ $message }}</span>
+                            @endif
                         @enderror
                     </label>
                     <button type="submit">Save project details</button>
@@ -210,25 +232,46 @@
 
 <script>
     document.addEventListener('click', function (event) {
-        const trigger = event.target.closest('.project-edit-trigger');
+        const trigger = event.target.closest('.project-action-trigger');
 
         if (!trigger) {
             return;
         }
 
-        const editor = document.getElementById(trigger.getAttribute('aria-controls'));
         const projectCard = trigger.closest('.report-tile');
+        const projectGrid = trigger.closest('.ppa-grid');
 
-        if (!editor || !projectCard) {
+        if (!projectCard || !projectGrid) {
             return;
         }
 
-        const isOpening = editor.hidden;
-        editor.hidden = !isOpening;
-        trigger.setAttribute('aria-expanded', String(isOpening));
+        event.preventDefault();
+        event.stopPropagation();
 
-        if (isOpening) {
+        if (projectGrid.dataset.ppaAdminMode === 'edit') {
+            const editor = projectCard.querySelector('.project-editor');
+
+            if (!editor) {
+                return;
+            }
+
             projectCard.open = true;
+            editor.hidden = false;
+            editor.querySelector('input[name="name"]')?.focus();
+            return;
+        }
+
+        if (projectGrid.dataset.ppaAdminMode === 'delete') {
+            const deleteForm = projectCard.querySelector('.project-delete-form');
+
+            if (deleteForm) {
+                window.dispatchEvent(new CustomEvent('ppa:confirm-project-delete', {
+                    detail: {
+                        form: deleteForm,
+                        projectName: deleteForm.dataset.projectName,
+                    },
+                }));
+            }
         }
     });
 </script>

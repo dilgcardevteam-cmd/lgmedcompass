@@ -51,6 +51,13 @@ class LoginRequest extends FormRequest
         $user = User::where($field, $login)->first();
 
         if (! $user) {
+            if (User::onlyTrashed()->where($field, $login)->exists()) {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'login' => 'Your account has been deactivated. Please contact the administrator for assistance.',
+                ]);
+            }
+
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'login' => 'The username or email does not exist in our records.',

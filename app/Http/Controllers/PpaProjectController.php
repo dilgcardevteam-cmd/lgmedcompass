@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePpaProjectRequest;
 use App\Http\Requests\UpdatePpaProjectRequest;
 use App\Models\PpaProject;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PpaProjectController extends Controller
@@ -65,5 +67,37 @@ class PpaProjectController extends Controller
         return redirect()
             ->route('ppa.section', $project->section_code)
             ->with('success', 'Project details updated successfully.');
+    }
+
+    public function storeProject(StorePpaProjectRequest $request, string $sectionCode): RedirectResponse
+    {
+        abort_unless(isset(self::SECTIONS[$sectionCode]), 404);
+
+        $nextSortOrder = PpaProject::query()
+            ->where('section_code', $sectionCode)
+            ->max('sort_order') + 1;
+
+        PpaProject::query()->create([
+            ...$request->validated(),
+            'section_code' => $sectionCode,
+            'sort_order' => $nextSortOrder,
+            'is_active' => true,
+        ]);
+
+        return redirect()
+            ->route('ppa.section', $sectionCode)
+            ->with('success', 'Project added successfully.');
+    }
+
+    public function destroyProject(Request $request, PpaProject $project): RedirectResponse
+    {
+        abort_unless($request->user()?->role === 'Admin', 403);
+
+        $sectionCode = $project->section_code;
+        $project->delete();
+
+        return redirect()
+            ->route('ppa.section', $sectionCode)
+            ->with('success', 'Project permanently deleted.');
     }
 }
