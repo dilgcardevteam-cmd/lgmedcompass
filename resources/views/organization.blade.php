@@ -406,7 +406,7 @@
                                     <div class="flex items-center gap-2">
                                         <span class="h-[1px] w-4 bg-amber-600"></span>
                                         <p class="text-[10px] font-bold uppercase text-amber-700 tracking-tighter">
-                                            LGOO VII • OIC - Division Chief
+                                            LGOO VII • Division Chief
                                         </p>
                                     </div>
                                 </div>

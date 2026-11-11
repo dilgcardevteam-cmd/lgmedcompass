@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('documents:delete-old')->daily();
+Schedule::command('requests:send-deadline-reminders')->dailyAt('08:00');

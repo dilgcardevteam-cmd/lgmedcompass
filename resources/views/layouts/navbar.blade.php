@@ -51,9 +51,18 @@
                 Organization
             </a>
 
-            <a href="{{ url('/reports-landing') }}" class="nav-link-custom px-3 py-2 rounded-lg text-sm font-bold text-white">
-                PPA's
-            </a>
+            <details class="services-dropdown">
+                <summary class="nav-link-custom px-3 py-2 rounded-lg text-sm font-bold text-white">
+                    Services
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+                    </svg>
+                </summary>
+                <div class="services-dropdown-panel">
+                    <a href="{{ route('reports.landing') }}">PPAs</a>
+                    <a href="{{ route('request.index') }}">Request</a>
+                </div>
+            </details>
 
             <div class="h-6 w-px bg-white/20 mx-2"></div>
 
@@ -82,7 +91,13 @@
 
     <a href="{{ url('/') }}" class="text-lg font-bold text-white">Home</a>
     <a href="{{ url('/organization') }}" class="text-lg font-bold text-white">Organization</a>
-    <a href="{{ url('/reports-landing') }}" class="text-lg font-bold text-white">PPA's</a>
+    <details class="services-dropdown-mobile">
+        <summary class="text-lg font-bold text-white">Services</summary>
+        <div class="services-dropdown-mobile-panel">
+            <a href="{{ route('reports.landing') }}" class="text-base font-semibold text-white">PPAs</a>
+            <a href="{{ route('request.index') }}" class="text-base font-semibold text-white">Request</a>
+        </div>
+    </details>
 
     <a href="{{ route('login') }}"
        class="bg-[#f6c76f] text-black text-center py-3 rounded-lg font-black uppercase">
@@ -107,6 +122,71 @@
 
 .navbar a{
     text-decoration:none;
+}
+
+.services-dropdown > summary,
+.services-dropdown-mobile > summary{
+    cursor:pointer;
+    list-style:none;
+}
+
+.services-dropdown{
+    position:relative;
+}
+
+.services-dropdown > summary::-webkit-details-marker,
+.services-dropdown-mobile > summary::-webkit-details-marker{
+    display:none;
+}
+
+.services-dropdown > summary{
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+}
+
+.services-dropdown-panel{
+    display:none;
+    position:absolute;
+    top:calc(100% + .5rem);
+    right:0;
+    min-width:10rem;
+    padding:.5rem;
+    border-radius:.75rem;
+    background:#fff;
+    box-shadow:0 12px 24px rgba(15,23,42,.2);
+}
+
+.services-dropdown[open] .services-dropdown-panel{
+    display:flex;
+    flex-direction:column;
+}
+
+.services-dropdown-panel a{
+    padding:.6rem .75rem;
+    border-radius:.5rem;
+    color:#1e293b;
+    font-size:.875rem;
+    font-weight:700;
+}
+
+.services-dropdown-panel a:hover{
+    background:#fef3c7;
+}
+
+.services-dropdown-mobile > summary{
+    width:fit-content;
+}
+
+.services-dropdown-mobile-panel{
+    display:none;
+    flex-direction:column;
+    gap:.75rem;
+    padding:.75rem 0 0 1rem;
+}
+
+.services-dropdown-mobile[open] .services-dropdown-mobile-panel{
+    display:flex;
 }
 
 /* Mobile animation */

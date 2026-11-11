@@ -589,6 +589,9 @@
             <a class="item {{ request()->routeIs('documents.my-tasks') || request()->routeIs('documents.my-uploads') || request()->routeIs('documents.workflow') || request()->routeIs('documents.archivePage') || request()->routeIs('workflow.documents.*') || request()->routeIs('documentsProcess.*') ? 'active' : '' }}" href="{{ route('documents.my-tasks') }}" data-title="Process">
                 <i class="uil uil-sync"></i><span>Process</span>
             </a>
+            <a class="item {{ request()->routeIs('request.index') ? 'active' : '' }}" href="{{ route('request.index') }}" data-title="Request">
+                <i class="uil uil-file-edit-alt"></i><span>Request</span>
+            </a>
             <a class="item {{ request()->routeIs('ppa.*') ? 'active' : '' }}" href="{{ route('ppa.index') }}" data-title="PPAs">
                 <i class="uil uil-chart-growth"></i><span>PPAs</span>
             </a>

@@ -11,6 +11,7 @@ use App\Http\Controllers\DriveController;
 use App\Http\Controllers\PpaProjectController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\ServiceRequestController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,19 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => view('welcome'))->name('welcome');
 Route::get('/organization', fn () => view('organization'))->name('organization');
 Route::get('/reports-landing', fn () => view('reports-landing'))->name('reports.landing');
+Route::get('/request', [ServiceRequestController::class, 'index'])->name('request.index');
+Route::post('/request', [ServiceRequestController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('request.store');
+Route::get('/request/track/{token}', [ServiceRequestController::class, 'track'])
+    ->middleware('throttle:30,1')
+    ->name('request.track');
+Route::get('/request/track/{token}/deliverables/{deliverable}', [ServiceRequestController::class, 'downloadTrackedDeliverable'])
+    ->middleware('throttle:30,1')
+    ->name('request.track-deliverable');
+Route::post('/request/track/{token}/respond', [ServiceRequestController::class, 'respondToRequest'])
+    ->middleware('throttle:10,1')
+    ->name('request.respond');
 Route::get('/developers', fn () => view('developers'))->name('developers');
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
@@ -53,6 +67,18 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/request/updates', [ServiceRequestController::class, 'checkUpdates'])
+        ->name('request.check-updates');
+    Route::post('/request/{serviceRequest}/archive', [ServiceRequestController::class, 'archiveForRequester'])
+        ->name('request.archive');
+    Route::get('/request/{serviceRequest}/attachment', [ServiceRequestController::class, 'downloadAttachment'])
+        ->name('request.attachment');
+    Route::get('/request/{serviceRequest}/deliverables/{deliverable}', [ServiceRequestController::class, 'downloadDeliverable'])
+        ->name('request.deliverable');
+    Route::post('/request/{serviceRequest}/claim', [ServiceRequestController::class, 'claim'])
+        ->name('request.claim');
+    Route::patch('/request/{serviceRequest}/status', [ServiceRequestController::class, 'updateStatus'])
+        ->name('request.update-status');
 
     Route::middleware(['auth'])->group(function () {
         // PPA routes

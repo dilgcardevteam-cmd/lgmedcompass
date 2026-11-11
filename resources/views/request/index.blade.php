@@ -1,0 +1,9 @@
+@if(auth()->check())
+    <x-app-layout>
+        @include('request.content')
+    </x-app-layout>
+@else
+    <x-guest-layout>
+        @include('request.content')
+    </x-guest-layout>
+@endif
