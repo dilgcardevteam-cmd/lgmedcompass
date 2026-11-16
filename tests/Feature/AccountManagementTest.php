@@ -70,6 +70,23 @@ test('admin can update user role', function () {
     expect($targetUser->fresh()->role)->toBe('Admin');
 });
 
+test('admin can update or clear a user nickname', function () {
+    $admin = User::factory()->create(['role' => 'Admin']);
+    $targetUser = User::factory()->create(['nickname' => null]);
+
+    $this->actingAs($admin)
+        ->patchJson("/account-management/{$targetUser->id}/nickname", ['nickname' => 'Sam'])
+        ->assertOk()
+        ->assertJsonPath('success', true);
+
+    expect($targetUser->fresh()->nickname)->toBe('Sam');
+
+    $this->patchJson("/account-management/{$targetUser->id}/nickname", ['nickname' => ''])
+        ->assertOk();
+
+    expect($targetUser->fresh()->nickname)->toBeNull();
+});
+
 test('cannot demote the only admin user', function () {
     $admin = User::factory()->create([
         'role' => 'Admin',

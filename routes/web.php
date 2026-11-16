@@ -230,6 +230,7 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
         Route::patch('/users/{user}/approve', [AccountManagementController::class, 'approve'])->name('users.approve');
         Route::patch('/users/{user}/decline', [AccountManagementController::class, 'decline'])->name('users.decline');
         Route::patch('/account-management/{user}/update-section', [AccountManagementController::class, 'updateSection']);
+        Route::patch('/account-management/{user}/nickname', [AccountManagementController::class, 'updateNickname']);
         Route::patch('/account-management/{user}/role', [AccountManagementController::class, 'updateRole']);
         Route::delete('/account-management/{user}', [AccountManagementController::class, 'destroy'])
             ->name('account-management.destroy');

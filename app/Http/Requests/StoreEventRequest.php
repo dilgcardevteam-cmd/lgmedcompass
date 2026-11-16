@@ -25,7 +25,7 @@ class StoreEventRequest extends FormRequest
     {
         $rules = [
             'title' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:event,leave,offsite,official_business,holiday'],
+            'type' => ['required', 'in:event,leave,official_business,holiday'],
             'visibility_type' => ['required', 'in:private,section,global'],
             'notes' => ['nullable', 'string'],
             'start_date' => ['required', 'date'],
@@ -34,7 +34,6 @@ class StoreEventRequest extends FormRequest
                 'nullable',
                 'exists:sections,id',
                 'required_if:visibility_type,section',
-                'exclude_if:type,offsite',
                 'exclude_if:type,official_business',
                 'exclude_if:type,leave',
             ],
@@ -43,7 +42,6 @@ class StoreEventRequest extends FormRequest
                 'exclude_if:type,leave',
                 'nullable',
                 'exists:users,id',
-                'required_if:type,offsite',
             ],
             'focal_person_ids' => [
                 'exclude_unless:type,official_business',
@@ -62,6 +60,7 @@ class StoreEventRequest extends FormRequest
         ];
 
         if ($this->type === 'leave') {
+            $rules['title'] = ['nullable', 'string', 'max:255'];
             $rules['leave_type'] = ['required', 'string', Rule::in(Event::LEAVE_TYPES)];
             $rules['leave_type_other'] = [
                 'nullable',
@@ -71,6 +70,14 @@ class StoreEventRequest extends FormRequest
             ];
             $rules['focal_person_ids'] = ['required', 'array', 'min:1'];
             $rules['focal_person_ids.*'] = ['required', 'integer', 'distinct', 'exists:users,id'];
+        } elseif ($this->type === 'event') {
+            $rules['activity_type'] = ['required', 'string', Rule::in(Event::ACTIVITY_TYPES)];
+            $rules['activity_type_other'] = [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf($this->input('activity_type') === 'Others, specify'),
+            ];
         } elseif ($this->type === 'official_business') {
             $rules['focal_person_ids'] = [
                 'required',
@@ -81,12 +88,11 @@ class StoreEventRequest extends FormRequest
         }
 
         // Conditional rule for location
-        if (in_array($this->type, ['offsite', 'official_business'], true)) {
+        if ($this->type === 'official_business') {
             $rules['location'] = [
                 'nullable',
                 'string',
                 'max:255',
-                'required_if:type,offsite',
                 'required_if:type,official_business',
             ];
         }
@@ -109,6 +115,9 @@ class StoreEventRequest extends FormRequest
             'leave_type.required' => 'Please select a type of leave.',
             'leave_type.in' => 'Please select a valid type of leave.',
             'leave_type_other.required' => 'Please specify the type of leave.',
+            'activity_type.required' => 'Please select a type of activity.',
+            'activity_type.in' => 'Please select a valid type of activity.',
+            'activity_type_other.required' => 'Please specify the type of activity.',
             'focal_person_ids.required' => 'Select at least one focal person.',
             'focal_person_ids.min' => 'Select at least one focal person.',
             'focal_person_ids.*.exists' => 'A selected focal person does not exist.',

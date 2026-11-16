@@ -29,7 +29,6 @@
                 <h2 class="text-sm font-semibold text-gray-600 mb-3">Designated Colors</h2>
                 <div class="flex flex-wrap gap-4 text-sm">
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-600"></span>Holiday</div>
-                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-indigo-500"></span>Off Site</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-500"></span>Leave</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400"></span>Global View</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-700"></span>Private</div>
@@ -89,13 +88,6 @@
                                     <span class="filter-label">Holiday</span>
                                 </label>
 
-                                {{-- Off Site --}}
-                                <label class="filter-item group">
-                                    <input type="checkbox" value="Off Site" checked class="calendar-filter rounded text-indigo-500">
-                                    <span class="filter-dot bg-indigo-500"></span>
-                                    <span class="filter-label">Off Site</span>
-                                </label>
-
                                 {{-- Official Business --}}
                                 <label class="filter-item group">
                                     <input type="checkbox" value="official_business" checked class="calendar-filter rounded" style="accent-color: #0f766e">
@@ -149,7 +141,7 @@
     @include('calendar.partials.event-modal')
     @include('calendar.partials.holiday-modal')
     @include('calendar.partials.leave-modal')
-    @include('calendar.partials.offsite-modal')
+    @include('calendar.partials.official-business-modal')
     @include('calendar.partials.view-modal')
     @endpush
 

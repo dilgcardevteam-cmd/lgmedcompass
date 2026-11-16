@@ -1,24 +1,24 @@
 @vite('resources/css/calendar.css')
 @vite('resources/css/calendar-modal.css')
-<div id="offsiteModal" class="calendar-modal hidden">
+<div id="officialBusinessModal" class="calendar-modal hidden">
     <div class="calendar-modal-overlay"></div>
 
     <div class="calendar-modal-card">
         <div class="calendar-modal-header">
-            <h2 id="offsiteModalTitle" class="calendar-modal-title">Add Off Site</h2>
-            <button type="button" class="calendar-modal-close-btn" onclick="closeModal('offsiteModal')">✕</button>
+            <h2 id="officialBusinessModalTitle" class="calendar-modal-title">Add Official Business</h2>
+            <button type="button" class="calendar-modal-close-btn" onclick="closeModal('officialBusinessModal')">✕</button>
         </div>
 
         <form method="POST"
               action="{{ route('calendar.events.store') }}"
               data-store-url="{{ route('calendar.events.store') }}"
               class="calendar-modal-form calendar-ajax-form"
-              data-type="offsite">
+              data-type="official_business">
             @csrf
 
-            @include('calendar.partials.event-type-select', ['selectedType' => 'offsite'])
+            @include('calendar.partials.event-type-select', ['selectedType' => 'official_business'])
 
-            <input type="hidden" name="type" value="offsite">
+            <input type="hidden" name="type" value="official_business">
             <input type="hidden" name="visibility_type" value="global">
 
             <!-- Subject -->

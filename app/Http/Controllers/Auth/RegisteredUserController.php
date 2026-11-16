@@ -48,6 +48,7 @@ class RegisteredUserController extends Controller
 
             'first_name' => ['required', 'string', 'min:2', 'regex:/^[A-Za-z]+(?:\s[A-Za-z]+)*$/'],
             'last_name' => ['required', 'string', 'min:2', 'regex:/^[A-Za-z]+(?:\s[A-Za-z]+)*$/'],
+            'nickname' => ['nullable', 'string', 'max:255'],
             'position' => ['required', 'string', 'min:2', 'regex:/^[A-Za-z0-9\s().#-]+$/'],
             'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:users,username'],
             'email' => [
@@ -89,6 +90,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
+            'nickname' => $request->nickname,
             'position' => $request->position,
             'username' => $request->username,
             'email' => $request->email,

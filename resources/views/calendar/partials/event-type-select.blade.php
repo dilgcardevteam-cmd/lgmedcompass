@@ -4,7 +4,6 @@
             data-create-event-type
             aria-label="Calendar entry type">
         <option value="event" @selected($selectedType === 'event')>Activity</option>
-        <option value="offsite" @selected($selectedType === 'offsite')>Off Site</option>
         <option value="official_business" @selected($selectedType === 'official_business')>Official Business</option>
         <option value="leave" @selected($selectedType === 'leave')>Leave</option>
         <option value="holiday" @selected($selectedType === 'holiday')>Holiday</option>

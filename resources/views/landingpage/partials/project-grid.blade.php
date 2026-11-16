@@ -16,6 +16,14 @@
         height: auto;
     }
 
+    .ppa-grid[data-ppa-admin-mode="edit"] .report-tile {
+        background-color: #fef3c7;
+    }
+
+    .ppa-grid[data-ppa-admin-mode="delete"] .report-tile {
+        background-color: #fee2e2;
+    }
+
     .ppa-grid .project-summary,
     .modern-grid .project-summary {
         box-sizing: border-box;

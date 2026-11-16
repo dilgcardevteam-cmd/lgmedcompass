@@ -1,3 +1,15 @@
+@php
+    $resourceLinks = [
+        ['label' => '01 Regional/Division Orders (Policies)', 'url' => 'https://drive.google.com/drive/u/1/folders/1md7KyYPpOim9F_GwcNtFQadQ3NYquej8'],
+        ['label' => '02 Performance Audit Results, and Analytics Reports Shared folder', 'url' => 'https://drive.google.com/drive/u/1/folders/1U-sH7yi2nA1L5CWtid61-SJjxplz6dk1'],
+        ['label' => '03 CapDev Intervention / Action Plans', 'url' => 'https://drive.google.com/drive/u/1/folders/1MZ4n5xYa_uZhVQ5UTYUyz4YptWCYM_3j'],
+        ['label' => '04 Partnership and Collaboration', 'url' => 'https://drive.google.com/drive/u/1/folders/1evYB-zT3gnd7rnPiW2RPJ39lS4Cwidsi'],
+        ['label' => '05 Post Activity Reports', 'url' => 'https://drive.google.com/drive/u/1/folders/1dBW9GlrdmuOKxjKvI3pJkDxyjScwFBAU'],
+        ['label' => '06 Databases', 'url' => 'https://drive.google.com/drive/u/1/folders/1z9Dq-9frcvMcqZ9QY4AHhZCA8tE9KUJA'],
+        ['label' => '07 Resolution', 'url' => 'https://drive.google.com/drive/u/1/folders/1i8b19Wdb2kvm6oAgbu_kmN5SQj3kvQao'],
+    ];
+@endphp
+
 <body class="pt-16 md:pt-20">
 
 <nav style="background-color:#1E3A8A !important;"
@@ -61,6 +73,20 @@
                 <div class="services-dropdown-panel">
                     <a href="{{ route('reports.landing') }}">PPAs</a>
                     <a href="{{ route('request.index') }}">Request</a>
+                    <div class="services-dropdown-divider"></div>
+                    <details class="services-resources-dropdown">
+                        <summary>
+                            Resources
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="services-resources-panel">
+                            @foreach ($resourceLinks as $resource)
+                                <a href="{{ $resource['url'] }}" target="_blank" rel="noopener noreferrer">{{ $resource['label'] }}</a>
+                            @endforeach
+                        </div>
+                    </details>
                 </div>
             </details>
 
@@ -96,6 +122,19 @@
         <div class="services-dropdown-mobile-panel">
             <a href="{{ route('reports.landing') }}" class="text-base font-semibold text-white">PPAs</a>
             <a href="{{ route('request.index') }}" class="text-base font-semibold text-white">Request</a>
+            <details class="services-resources-dropdown-mobile">
+                <summary>
+                    Resources
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+                    </svg>
+                </summary>
+                <div class="services-resources-mobile-panel">
+                    @foreach ($resourceLinks as $resource)
+                        <a href="{{ $resource['url'] }}" target="_blank" rel="noopener noreferrer">{{ $resource['label'] }}</a>
+                    @endforeach
+                </div>
+            </details>
         </div>
     </details>
 
@@ -125,7 +164,8 @@
 }
 
 .services-dropdown > summary,
-.services-dropdown-mobile > summary{
+.services-dropdown-mobile > summary,
+.services-resources-dropdown-mobile > summary{
     cursor:pointer;
     list-style:none;
 }
@@ -135,7 +175,8 @@
 }
 
 .services-dropdown > summary::-webkit-details-marker,
-.services-dropdown-mobile > summary::-webkit-details-marker{
+.services-dropdown-mobile > summary::-webkit-details-marker,
+.services-resources-dropdown-mobile > summary::-webkit-details-marker{
     display:none;
 }
 
@@ -150,7 +191,9 @@
     position:absolute;
     top:calc(100% + .5rem);
     right:0;
-    min-width:10rem;
+    width:23rem;
+    max-height:calc(100vh - 7rem);
+    overflow-y:auto;
     padding:.5rem;
     border-radius:.75rem;
     background:#fff;
@@ -168,10 +211,99 @@
     color:#1e293b;
     font-size:.875rem;
     font-weight:700;
+    line-height:1.4;
 }
 
 .services-dropdown-panel a:hover{
     background:#fef3c7;
+}
+
+.services-resources-dropdown > summary,
+.services-resources-dropdown-mobile > summary{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:.5rem;
+    padding:.6rem .75rem;
+    border-radius:.5rem;
+    color:#1e293b;
+    font-size:.875rem;
+    font-weight:700;
+    cursor:pointer;
+    list-style:none;
+}
+
+.services-resources-dropdown > summary::-webkit-details-marker,
+.services-resources-dropdown-mobile > summary::-webkit-details-marker{
+    display:none;
+}
+
+.services-resources-dropdown[open] > summary svg{
+    transform:rotate(180deg);
+}
+
+.services-resources-dropdown > summary:hover{
+    background:#fef3c7;
+}
+
+.services-resources-panel{
+    display:none;
+    flex-direction:column;
+    margin:.25rem 0 .25rem .75rem;
+    padding-left:.5rem;
+    border-left:2px solid #e2e8f0;
+}
+
+.services-resources-dropdown[open] .services-resources-panel{
+    display:flex;
+}
+
+.services-resources-panel a{
+    font-size:.8rem;
+}
+
+.services-resources-dropdown-mobile > summary{
+    width:fit-content;
+    color:white;
+    font-size:1rem;
+}
+
+.services-resources-dropdown-mobile > summary svg{
+    transition:transform .2s ease;
+}
+
+.services-resources-dropdown-mobile[open] > summary svg{
+    transform:rotate(180deg);
+}
+
+.services-resources-mobile-panel{
+    display:none;
+    flex-direction:column;
+    gap:.75rem;
+    margin:.5rem 0 0 .5rem;
+    padding-left:.75rem;
+    border-left:1px solid rgba(255,255,255,.25);
+}
+
+.services-resources-dropdown-mobile[open] .services-resources-mobile-panel{
+    display:flex;
+}
+
+.services-resources-mobile-panel a{
+    color:white;
+    font-size:.9rem;
+    font-weight:600;
+    line-height:1.4;
+    text-decoration:none;
+}
+
+.services-resources-mobile-panel a:hover{
+    color:#f6c76f;
+}
+
+.services-dropdown-divider{
+    margin:.4rem .75rem 0;
+    border-top:1px solid #e2e8f0;
 }
 
 .services-dropdown-mobile > summary{

@@ -2042,11 +2042,14 @@ rtpForm?.addEventListener('submit', function(e) {
 });
 
 // ==================== COMBOBOX FUNCTIONALITY ====================
-document.addEventListener('DOMContentLoaded', function() {
+function initializeTypeOfPaperCombobox() {
     // Type of Paper Combobox
     const typeOfPaperInput = document.querySelector('input[name="type_of_paper"]');
     const typeOfPaperOtherGroup = document.querySelector('[data-type-of-paper-other-group]');
     const typeOfPaperOtherInput = document.querySelector('input[name="type_of_paper_other"]');
+    const typeOfPaperContainer = typeOfPaperInput?.parentElement;
+    const typeOfPaperButton = typeOfPaperContainer?.querySelector('.combobox-btn');
+    const typeOfPaperList = typeOfPaperContainer?.querySelector('.combobox-list');
 
     function toggleOtherPaperType() {
         const isOther = typeOfPaperInput?.value.trim() === 'Others';
@@ -2057,55 +2060,47 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isOther) typeOfPaperOtherInput.value = '';
         }
     }
-    
-    if (typeOfPaperInput) {
-        // Find the parent div and then find button and list
-        const parentDiv = typeOfPaperInput.parentElement;
-        const typeOfPaperBtn = parentDiv?.querySelector('.combobox-btn');
-        const typeOfPaperList = parentDiv?.querySelector('.combobox-list');
-        
-        if (typeOfPaperBtn && typeOfPaperList) {
-            // Toggle dropdown
-            typeOfPaperBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                typeOfPaperList.classList.toggle('hidden');
-            });
-            
-            // Handle option selection
-            typeOfPaperList.addEventListener('click', function(e) {
-                if (e.target.tagName === 'LI') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const value = e.target.getAttribute('data-value');
-                    typeOfPaperInput.value = value;
-                    typeOfPaperList.classList.add('hidden');
-                    toggleOtherPaperType();
-                }
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!parentDiv.contains(e.target)) {
-                    typeOfPaperList.classList.add('hidden');
-                }
-            });
-            
-            // Hide dropdown when input loses focus
-            typeOfPaperInput.addEventListener('blur', function() {
-                setTimeout(() => {
-                    typeOfPaperList.classList.add('hidden');
-                }, 200);
-            });
-            
-            // Show dropdown when input is focused
-            typeOfPaperInput.addEventListener('focus', function() {
-                typeOfPaperList.classList.remove('hidden');
-            });
-            typeOfPaperInput.addEventListener('input', toggleOtherPaperType);
-            toggleOtherPaperType();
-        }
+
+    if (!typeOfPaperInput || !typeOfPaperButton || !typeOfPaperList || !typeOfPaperContainer) {
+        return;
     }
-});
+
+    typeOfPaperButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        typeOfPaperList.classList.toggle('hidden');
+    });
+
+    typeOfPaperList.addEventListener('pointerdown', function(event) {
+        const option = event.target.closest('li[data-value]');
+        if (!option) {
+            return;
+        }
+
+        event.preventDefault();
+        typeOfPaperInput.value = option.dataset.value;
+        typeOfPaperInput.dispatchEvent(new Event('input', { bubbles: true }));
+        typeOfPaperInput.dispatchEvent(new Event('change', { bubbles: true }));
+        typeOfPaperList.classList.add('hidden');
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!typeOfPaperContainer.contains(event.target)) {
+            typeOfPaperList.classList.add('hidden');
+        }
+    });
+
+    typeOfPaperInput.addEventListener('focus', function() {
+        typeOfPaperList.classList.remove('hidden');
+    });
+    typeOfPaperInput.addEventListener('input', toggleOtherPaperType);
+    toggleOtherPaperType();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeTypeOfPaperCombobox, { once: true });
+} else {
+    initializeTypeOfPaperCombobox();
+}
     </script>
 </x-app-layout>

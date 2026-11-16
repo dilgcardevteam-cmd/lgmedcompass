@@ -21,23 +21,6 @@
             <input type="hidden" name="type" value="leave">
             <input type="hidden" name="visibility_type" value="global">
 
-            <!-- Subject -->
-            <div class="calendar-modal-row icon-field">
-                <x-heroicon-o-document-text class="input-icon" />
-                <input type="text"
-                    name="title"
-                    placeholder="Subject"
-                    maxlength="100"
-                    class="calendar-modal-input with-icon title-input"
-                    oninput="handleTitleInput(this)">
-            </div>
-            <div class="title-limit-row">
-                <span class="title-warning hidden text-red-500 text-xs font-medium">Maximum 100 characters reached</span>
-                <span class="text-gray-400 text-xs ml-auto">
-                    <span class="title-counter">0</span>/100 characters
-                </span>
-            </div>
-
             <div class="calendar-modal-row icon-field">
                 <x-heroicon-o-document-text class="input-icon" />
                 <select name="leave_type"
@@ -69,7 +52,7 @@
                     <select name="focal_person_id"
                             class="calendar-modal-input with-icon"
                             required>
-                        <option value="">Select Focal Person</option>
+                        <option value="">Select Personnel</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}">
                                 {{ $user->name }} ({{ optional($user->section)->name }})
@@ -83,7 +66,7 @@
                 <div class="calendar-focal-person-heading">
                     <x-heroicon-o-user-group class="input-icon" />
                     <div>
-                        <p class="calendar-focal-person-title">Focal Persons</p>
+                        <p class="calendar-focal-person-title">Personnel</p>
                         <p class="calendar-focal-person-hint">Select one or more people for this leave.</p>
                     </div>
                 </div>
@@ -93,7 +76,7 @@
                         <input type="search"
                                class="calendar-modal-input with-icon"
                                placeholder="Search name, position, or section"
-                               aria-label="Search focal persons"
+                               aria-label="Search personnel"
                                data-focal-person-search>
                     </div>
                     <p class="calendar-focal-person-search-results"
@@ -101,7 +84,7 @@
                        aria-live="polite"></p>
                 </div>
                 <fieldset class="calendar-focal-person-options" data-focal-person-options>
-                    <legend class="sr-only">Focal persons</legend>
+                    <legend class="sr-only">Personnel</legend>
                     @foreach($users as $user)
                         <label class="calendar-focal-person-option"
                                data-search-text="{{ $user->name }} {{ $user->position }} {{ optional($user->section)->name }}">

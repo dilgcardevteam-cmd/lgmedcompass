@@ -43,6 +43,11 @@ class CalendarController extends Controller
                 $isAllDay = $start->format('H:i:s') === '00:00:00'
                         && $end->format('H:i:s') === '00:00:00';
 
+                $personnel = array_values(array_unique(array_filter([
+                    $event->user?->name,
+                    ...$event->focalPersonNameList(),
+                ])));
+
                 if ($isAllDay) {
                     $startFormatted = $start->format('Y-m-d');
                     // FullCalendar exclusive end → add one day
@@ -57,14 +62,17 @@ class CalendarController extends Controller
 
                 return [
                     'id' => $event->id,
-                    'title' => $event->title,
+                    'title' => $event->calendar_title,
 
                     'start' => $startFormatted,
                     'end' => $endFormatted,
 
                     'color' => $event->calendar_color,
 
-                    'type' => $event->type,
+                    'type' => $event->calendar_type,
+                    'subject' => $event->title,
+                    'activity_type' => $event->activity_type,
+                    'activity_type_other' => $event->activity_type_other,
                     'leave_type' => $event->leave_type,
                     'leave_type_other' => $event->leave_type_other,
                     'location' => $event->location,
@@ -74,6 +82,7 @@ class CalendarController extends Controller
                     'section' => $event->section?->name,
                     'focal_person' => $event->focalPersonNames(),
                     'created_by' => $event->user?->name,
+                    'personnel' => $personnel,
                 ];
             });
 
@@ -117,7 +126,6 @@ class CalendarController extends Controller
                 $visibilityType = 'section';
 
                 break;
-            case 'offsite':
             case 'official_business':
 
                 $focalPersonId = $focalPersonIds[0] ?? null;
@@ -166,8 +174,14 @@ class CalendarController extends Controller
         */
 
         $event = Event::create([
-            'title' => $request->title,
+            'title' => $type === 'leave'
+                ? ($request->leave_type === 'Others, specify' ? $request->leave_type_other : $request->leave_type)
+                : $request->title,
             'type' => $type,
+            'activity_type' => $type === 'event' ? $request->activity_type : null,
+            'activity_type_other' => $type === 'event' && $request->activity_type === 'Others, specify'
+                ? $request->activity_type_other
+                : null,
             'leave_type' => $type === 'leave' ? $request->leave_type : null,
             'leave_type_other' => $type === 'leave' && $request->leave_type === 'Others, specify'
                 ? $request->leave_type_other
@@ -233,8 +247,8 @@ class CalendarController extends Controller
             $events->push([
                 'id' => $event->id,
                 'dismissKey' => "event-{$event->id}-{$today->format('Y-m-d')}",
-                'title' => $event->title,
-                'type' => $event->type,
+                'title' => $event->calendar_title,
+                'type' => $event->calendar_type,
                 'color' => $event->calendar_color ?? '#3b82f6',
                 'time' => $timeDisplay,
                 'section' => $label,
@@ -267,8 +281,8 @@ class CalendarController extends Controller
             $events->push([
                 'id' => $event->id,
                 'dismissKey' => "event-{$event->id}-{$tomorrow->format('Y-m-d')}",
-                'title' => $event->title,
-                'type' => $event->type,
+                'title' => $event->calendar_title,
+                'type' => $event->calendar_type,
                 'color' => $event->calendar_color ?? '#3b82f6',
                 'time' => $timeDisplay,
                 'section' => $label,
@@ -308,10 +322,10 @@ class CalendarController extends Controller
                 : $start->format('M d h:i A').' - '.$end->format('M d h:i A');
 
             return [
-                'title' => $event->title,
+                'title' => $event->calendar_title,
                 'date' => $start->format('M d, Y'),
                 'time' => $time,
-                'type' => $event->type,
+                'type' => $event->calendar_type,
                 'color' => $event->calendar_color,
                 'label' => $event->isSection()
                                     ? optional($event->section)->name
@@ -353,8 +367,11 @@ class CalendarController extends Controller
 
         return response()->json([
             'id' => $event->id,
-            'title' => $event->title,
-            'type' => $event->type,
+            'title' => $event->calendar_title,
+            'type' => $event->calendar_type,
+            'subject' => $event->title,
+            'activity_type' => $event->activity_type,
+            'activity_type_other' => $event->activity_type_other,
             'leave_type' => $event->leave_type,
             'leave_type_other' => $event->leave_type_other,
             'location' => $event->location,
@@ -398,8 +415,11 @@ class CalendarController extends Controller
             'end_date' => $request->end_date,
             'focal_person_id' => $request->focal_person_id,
         ]);
+        $type = $event->calendar_type;
         $rules = [
-            'title' => 'required|string|max:255',
+            'title' => $type === 'leave'
+                ? 'nullable|string|max:255'
+                : 'required|string|max:255',
             'location' => 'nullable|string|max:255',
             'link' => 'nullable|url|max:255',
             'notes' => 'nullable|string',
@@ -407,20 +427,28 @@ class CalendarController extends Controller
             'end_date' => 'required',
         ];
 
-        if (in_array($event->type, ['leave', 'official_business'], true)) {
+        if (in_array($type, ['leave', 'official_business'], true)) {
             $rules['focal_person_ids'] = ['required', 'array', 'min:1'];
             $rules['focal_person_ids.*'] = ['required', 'integer', 'distinct', 'exists:users,id'];
         } else {
             $rules['focal_person_id'] = ['nullable', 'integer', 'exists:users,id'];
         }
 
-        if ($event->type === 'leave') {
+        if ($type === 'leave') {
             $rules['leave_type'] = ['required', 'string', Rule::in(Event::LEAVE_TYPES)];
             $rules['leave_type_other'] = [
                 'nullable',
                 'string',
                 'max:255',
                 Rule::requiredIf($request->input('leave_type') === 'Others, specify'),
+            ];
+        } elseif ($type === 'event') {
+            $rules['activity_type'] = ['required', 'string', Rule::in(Event::ACTIVITY_TYPES)];
+            $rules['activity_type_other'] = [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf($request->input('activity_type') === 'Others, specify'),
             ];
         }
 
@@ -447,8 +475,6 @@ class CalendarController extends Controller
             $request->merge(['start_date' => $start, 'end_date' => $end]);
         }
 
-        $type = $event->type;
-
         $sectionId = $request->section_id;
         $focalPersonIds = in_array($type, ['leave', 'official_business'], true)
             ? array_values(array_unique($validated['focal_person_ids']))
@@ -465,7 +491,6 @@ class CalendarController extends Controller
                 break;
 
             case 'leave':
-            case 'offsite':
             case 'official_business':
 
                 $focalPersonId = $focalPersonIds[0] ?? null;
@@ -488,7 +513,16 @@ class CalendarController extends Controller
         }
 
         $event->update([
-            'title' => $request->title,
+            'title' => $type === 'leave'
+                ? ($validated['leave_type'] === 'Others, specify'
+                    ? $validated['leave_type_other']
+                    : $validated['leave_type'])
+                : $validated['title'],
+            'type' => $type,
+            'activity_type' => $type === 'event' ? $validated['activity_type'] : null,
+            'activity_type_other' => $type === 'event' && $validated['activity_type'] === 'Others, specify'
+                ? $validated['activity_type_other']
+                : null,
             'leave_type' => $type === 'leave' ? $validated['leave_type'] : null,
             'leave_type_other' => $type === 'leave' && $validated['leave_type'] === 'Others, specify'
                 ? $validated['leave_type_other']

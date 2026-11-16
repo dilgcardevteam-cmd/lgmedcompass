@@ -146,7 +146,7 @@
             transition: var(--transition-smooth);
             padding-top: 20px;
         }
-        body.sidebar-open .sidebar { width: var(--sidebar-expanded-width); }
+        body.sidebar-open .sidebar { width: var(--sidebar-expanded-width); overflow-y: auto; }
         .item {
             display: flex; align-items: center; height: 52px;
             margin: 4px 14px;
@@ -185,6 +185,52 @@
         .sidebar-divider {
             margin: 12px 28px;
             border-top: 1px solid rgba(15, 23, 42, 0.12);
+        }
+        .resources-toggle {
+            width: calc(100% - 28px);
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+        }
+        .resources-toggle .resources-chevron {
+            min-width: auto;
+            margin-left: auto;
+            margin-right: 14px;
+            font-size: 14px;
+            opacity: 0;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        body.sidebar-open .resources-toggle .resources-chevron {
+            opacity: 1;
+        }
+        .resources-toggle[aria-expanded="true"] .resources-chevron {
+            transform: rotate(180deg);
+        }
+        .resources-submenu {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin: 0 12px 8px 26px;
+        }
+        .resources-submenu[hidden] {
+            display: none;
+        }
+        .resources-link {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 10px;
+            color: var(--slate-600);
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+        .resources-link:hover {
+            background: var(--brand-light);
+            color: var(--brand-dark);
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -610,6 +656,20 @@
                 <img class="item-logo" src="{{ asset('images/dilg-logo.png') }}" alt="">
                 <span>DILG Intranet</span>
             </a>
+            <button class="item resources-toggle" type="button" data-title="Resources" aria-expanded="false" aria-controls="resourcesSubmenu" onclick="toggleResourcesMenu()">
+                <i class="uil uil-folder-open"></i>
+                <span>Resources</span>
+                <i class="uil uil-angle-down resources-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="resources-submenu" id="resourcesSubmenu" hidden>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1md7KyYPpOim9F_GwcNtFQadQ3NYquej8" target="_blank" rel="noopener noreferrer">01 Regional/Division Orders (Policies)</a>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1U-sH7yi2nA1L5CWtid61-SJjxplz6dk1" target="_blank" rel="noopener noreferrer">02 Performance Audit Results, and Analytics Reports Shared folder</a>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1MZ4n5xYa_uZhVQ5UTYUyz4YptWCYM_3j" target="_blank" rel="noopener noreferrer">03 CapDev Intervention / Action Plans</a>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1evYB-zT3gnd7rnPiW2RPJ39lS4Cwidsi" target="_blank" rel="noopener noreferrer">04 Partnership and Collaboration</a>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1dBW9GlrdmuOKxjKvI3pJkDxyjScwFBAU" target="_blank" rel="noopener noreferrer">05 Post Activity Reports</a>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1z9Dq-9frcvMcqZ9QY4AHhZCA8tE9KUJA" target="_blank" rel="noopener noreferrer">06 Databases</a>
+                <a class="resources-link" href="https://drive.google.com/drive/u/1/folders/1i8b19Wdb2kvm6oAgbu_kmN5SQj3kvQao" target="_blank" rel="noopener noreferrer">07 Resolution</a>
+            </div>
             <a class="item" href="https://drive.google.com/drive/u/1/folders/1JN-8jz58sP3WFfKA058mxNDqVyb0mXAy" target="_blank" rel="noopener noreferrer" data-title="User Manual">
                 <i class="uil uil-book-open"></i><span>User Manual</span>
             </a>
@@ -666,7 +726,39 @@
     // ---------- SIDEBAR ----------
     function toggleSidebar() {
         document.body.classList.toggle('sidebar-open');
-        localStorage.setItem('sidebar-state', document.body.classList.contains('sidebar-open') ? 'open' : 'closed');
+        const isOpen = document.body.classList.contains('sidebar-open');
+        localStorage.setItem('sidebar-state', isOpen ? 'open' : 'closed');
+
+        if (!isOpen) {
+            const resourcesButton = document.querySelector('.resources-toggle');
+            const resourcesSubmenu = document.getElementById('resourcesSubmenu');
+
+            if (resourcesButton && resourcesSubmenu) {
+                resourcesButton.setAttribute('aria-expanded', 'false');
+                resourcesSubmenu.hidden = true;
+            }
+        }
+    }
+
+    function toggleResourcesMenu() {
+        const resourcesButton = document.querySelector('.resources-toggle');
+        const resourcesSubmenu = document.getElementById('resourcesSubmenu');
+
+        if (!resourcesButton || !resourcesSubmenu) {
+            return;
+        }
+
+        if (!document.body.classList.contains('sidebar-open')) {
+            document.body.classList.add('sidebar-open');
+            localStorage.setItem('sidebar-state', 'open');
+            resourcesButton.setAttribute('aria-expanded', 'true');
+            resourcesSubmenu.hidden = false;
+            return;
+        }
+
+        const isExpanded = resourcesButton.getAttribute('aria-expanded') === 'true';
+        resourcesButton.setAttribute('aria-expanded', String(!isExpanded));
+        resourcesSubmenu.hidden = isExpanded;
     }
 
     // ---------- DISMISS STORAGE (for event toasts) ----------
@@ -826,7 +918,6 @@
         const labels = {
             holiday: 'Holiday',
             leave: 'Leave',
-            offsite: 'Off Site',
             official_business: 'Official Business'
         };
         const key = (type || '').toString().toLowerCase();
@@ -838,7 +929,6 @@
         const icons = {
             holiday: 'bi-calendar-heart',
             leave: 'bi-person-walking',
-            offsite: 'bi-building',
             official_business: 'bi-briefcase'
         };
         const key = (type || '').toString().toLowerCase();

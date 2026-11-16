@@ -282,18 +282,20 @@ document.addEventListener('DOMContentLoaded', function () {
         return html;
     }
 
-    async function saveRowChanges(row, oldSectionId, oldRole) {
+    async function saveRowChanges(row, oldSectionId, oldRole, oldNickname) {
         const userId = row.dataset.userId;
         const sectionSelect = row.querySelector('.edit-section-select');
         const roleSelect = row.querySelector('.edit-role-select');
+        const nicknameInput = row.querySelector('.edit-nickname-input');
 
-        if (!sectionSelect || !roleSelect) {
-            console.error('Could not find select elements');
+        if (!sectionSelect || !roleSelect || !nicknameInput) {
+            console.error('Could not find account edit fields');
             return;
         }
 
         const newSectionId = sectionSelect.value;
         const newRole = roleSelect.value;
+        const newNickname = nicknameInput.value.trim();
 
         // ---------- Admin Transfer Confirmation ----------
         const isCurrentUserAdmin = window.currentUserRole === 'Admin';
@@ -352,6 +354,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(rolePayload)
             }));
         }
+        if (newNickname !== oldNickname) {
+            requests.push(fetch(window.updateNicknameUrl(userId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ _method: 'PATCH', nickname: newNickname })
+            }));
+        }
 
         if (requests.length === 0) {
             cancelRowEdit(row);
@@ -377,6 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (newSectionId != oldSectionId) row.dataset.sectionId = newSectionId;
             if (newRole != oldRole) row.dataset.role = newRole;
+            if (newNickname !== oldNickname) row.dataset.nickname = newNickname;
 
             cancelRowEdit(row);
             showDynamicToast(messages.join(' '), 'success');
@@ -401,6 +415,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function cancelRowEdit(row, originalSectionHtml, originalRoleHtml, originalActionsHtml) {
+        const nicknameDisplay = row.querySelector('.nickname-display');
         const sectionCell = row.querySelector('.section-cell');
         const roleCell = row.querySelector('.role-cell');
         const actionsCell = row.querySelector('.actions-cell');
@@ -434,6 +449,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        if (nicknameDisplay) {
+            nicknameDisplay.textContent = `Nickname: ${row.dataset.nickname || '—'}`;
+        }
+
         row.classList.remove('editing');
 
         const editBtn = row.querySelector('.edit-row-btn');
@@ -449,8 +468,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const sectionDisplaySpan = row.querySelector('.section-display');
         const roleDisplaySpan = row.querySelector('.role-display');
+        const nicknameDisplay = row.querySelector('.nickname-display');
 
-        if (!sectionDisplaySpan || !roleDisplaySpan) {
+        if (!sectionDisplaySpan || !roleDisplaySpan || !nicknameDisplay) {
             console.error('Missing display spans in row');
             return;
         }
@@ -459,6 +479,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const originalRoleHtml = roleDisplaySpan.outerHTML;
         const originalSectionId = row.dataset.sectionId || '';
         const originalRole = row.dataset.role;
+        const originalNickname = row.dataset.nickname || '';
 
         const sectionCell = row.querySelector('.section-cell');
         const roleCell = row.querySelector('.role-cell');
@@ -472,6 +493,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const sectionSelectHtml = buildSectionSelect(originalSectionId);
         const roleSelectHtml = buildRoleSelect(originalRole);
 
+        nicknameDisplay.innerHTML = `<input type="text" class="edit-nickname-input" maxlength="255" value="${escapeHtml(originalNickname)}" placeholder="Nickname (optional)" aria-label="Nickname">`;
         sectionCell.setAttribute('data-original-content', originalSectionHtml);
         roleCell.setAttribute('data-original-content', originalRoleHtml);
         sectionCell.innerHTML = sectionSelectHtml;
@@ -491,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const cancelBtn = actionsCell.querySelector('.cancel-row-btn');
 
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => saveRowChanges(row, originalSectionId, originalRole));
+            saveBtn.addEventListener('click', () => saveRowChanges(row, originalSectionId, originalRole, originalNickname));
         }
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {

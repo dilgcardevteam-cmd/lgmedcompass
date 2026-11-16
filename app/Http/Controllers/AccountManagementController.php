@@ -39,6 +39,7 @@ class AccountManagementController extends Controller
                 $query->where(function ($q) use ($nameFilter) {
                     $q->where('first_name', 'like', "%{$nameFilter}%")
                         ->orWhere('last_name', 'like', "%{$nameFilter}%")
+                        ->orWhere('nickname', 'like', "%{$nameFilter}%")
                         ->orWhere('username', 'like', "%{$nameFilter}%");
                 });
             })
@@ -239,6 +240,22 @@ class AccountManagementController extends Controller
         }
 
         return back()->with('status', 'Section updated successfully.');
+    }
+
+    public function updateNickname(Request $request, User $user): JsonResponse
+    {
+        $this->authorizeAccess('write');
+
+        $validated = $request->validate([
+            'nickname' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user->update(['nickname' => $validated['nickname'] ?? null]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nickname updated successfully.',
+        ]);
     }
 
     /**

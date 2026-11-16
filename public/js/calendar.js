@@ -97,7 +97,6 @@
                 modal.querySelector("#viewTitle").textContent = event.title || "";
                 const typeLabels = {
                     event: "Activity",
-                    offsite: "Off Site",
                     official_business: "Official Business",
                     leave: "Leave",
                     holiday: "Holiday"
@@ -226,14 +225,12 @@
         let dismissCreateDropdownOnScroll = null;
         const modalByCreateType = {
             event: "eventModal",
-            offsite: "offsiteModal",
-            official_business: "offsiteModal",
+            official_business: "officialBusinessModal",
             leave: "leaveModal",
             holiday: "holidayModal"
         };
         const createTypeLabels = {
             event: { title: "Create Activity", submit: "Save Activity" },
-            offsite: { title: "Add Off Site", submit: "Save Event" },
             official_business: { title: "Add Official Business", submit: "Save Official Business" },
             leave: { title: "Add Leave", submit: "Save Leave" },
             holiday: { title: "Add Holiday", submit: "Save Holiday" }
@@ -295,6 +292,19 @@
             }
         }
 
+        function updateActivityTypeOther(form) {
+            const activityType = form.querySelector("[data-activity-type]");
+            const wrapper = form.querySelector("[data-activity-type-other-wrapper]");
+            const otherInput = form.querySelector("[data-activity-type-other]");
+            const isOther = activityType?.value === "Others, specify";
+
+            wrapper?.classList.toggle("hidden", !isOther);
+            if (otherInput) {
+                otherInput.required = isOther;
+                if (!isOther) otherInput.value = "";
+            }
+        }
+
         document.querySelectorAll("[data-leave-type]").forEach(select => {
             const form = select.closest("form");
             if (!form) return;
@@ -302,6 +312,15 @@
             select.addEventListener("change", () => updateLeaveTypeOther(form));
             form.addEventListener("reset", () => requestAnimationFrame(() => updateLeaveTypeOther(form)));
             updateLeaveTypeOther(form);
+        });
+
+        document.querySelectorAll("[data-activity-type]").forEach(select => {
+            const form = select.closest("form");
+            if (!form) return;
+
+            select.addEventListener("change", () => updateActivityTypeOther(form));
+            form.addEventListener("reset", () => requestAnimationFrame(() => updateActivityTypeOther(form)));
+            updateActivityTypeOther(form);
         });
 
         function filterFocalPersons(form) {
@@ -344,6 +363,7 @@
 
             form.reset();
             updateLeaveTypeOther(form);
+            updateActivityTypeOther(form);
             form.removeAttribute("data-editing");
             const methodField = form.querySelector('input[name="_method"]');
             if (methodField) methodField.remove();
@@ -375,7 +395,8 @@
             }
 
             setCreateType(form, type);
-            form.querySelector(".title-counter").textContent = "0";
+            const titleCounter = form.querySelector(".title-counter");
+            if (titleCounter) titleCounter.textContent = "0";
             const notesCounter = form.querySelector("#notesCounter");
             if (notesCounter) notesCounter.textContent = "0";
             form.querySelector("[data-create-type-select-wrapper]")?.classList.remove("hidden");
@@ -819,6 +840,12 @@
                 if (window.innerWidth < 768) return { left: 'prev,next today', center: 'title', right: 'listWeek,timeGridDay' };
                 return { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' };
             }
+            function getEventHoverText(event) {
+                const personnel = event.extendedProps?.personnel || [];
+                return personnel.length
+                    ? `${event.title}\nPersonnel: ${personnel.join(', ')}`
+                    : event.title;
+            }
 
             window.calendar = new FullCalendar.Calendar(calendarEl, {
                 timeZone: 'Asia/Manila',  
@@ -898,6 +925,7 @@
                         ev.className = "popover-event";
                         ev.setAttribute("role", "button");
                         ev.setAttribute("tabindex", "0");
+                        ev.setAttribute("title", getEventHoverText(event));
                         const colorDot = document.createElement("span");
                         colorDot.className = "popover-event-dot";
                         colorDot.style.backgroundColor = event.backgroundColor || '#3788d8';
@@ -936,7 +964,7 @@
                 },
                 eventDidMount: function(info) {
                     info.el.classList.add('fc-event-touch-friendly');
-                    if (!isMobile()) info.el.setAttribute('title', info.event.title);
+                    if (!isMobile()) info.el.setAttribute('title', getEventHoverText(info.event));
                 },
                 events: function(fetchInfo, successCallback, failureCallback) {
                     fetch("/calendar/events")

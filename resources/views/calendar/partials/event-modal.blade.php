@@ -38,6 +38,31 @@
                 </span>
             </div>
 
+            <div class="calendar-modal-row icon-field">
+                <x-heroicon-o-list-bullet class="input-icon" />
+                <select name="activity_type"
+                        class="calendar-modal-input with-icon"
+                        data-activity-type
+                        required>
+                    <option value="">Select Type of Activity</option>
+                    @foreach(\App\Models\Event::ACTIVITY_TYPES as $activityType)
+                        <option value="{{ $activityType }}">{{ $activityType }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="hidden" data-activity-type-other-wrapper>
+                <div class="calendar-modal-row icon-field">
+                    <x-heroicon-o-pencil-square class="input-icon" />
+                    <input type="text"
+                           name="activity_type_other"
+                           placeholder="Specify type of activity"
+                           maxlength="255"
+                           class="calendar-modal-input with-icon"
+                           data-activity-type-other>
+                </div>
+            </div>
+
             <!-- ✅ VISIBILITY TYPE -->
             <div class="calendar-modal-row icon-field">
                 <x-heroicon-o-eye class="input-icon" />

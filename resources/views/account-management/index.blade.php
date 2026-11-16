@@ -20,6 +20,9 @@ setTimeout(() => {
         window.updateSectionUrl = function(userId) {
             return '{{ url("account-management") }}/' + userId + '/update-section';
         };
+        window.updateNicknameUrl = function(userId) {
+            return '{{ url("account-management") }}/' + userId + '/nickname';
+        };
         window.updateRoleUrl = function(userId) {
             return '{{ url("account-management") }}/' + userId + '/role';
         };
@@ -212,9 +215,10 @@ setTimeout(() => {
                 </div>
 
                 @forelse ($users as $managedUser)
-                    <div class="account-row" data-user-id="{{ $managedUser->id }}" data-section-id="{{ $managedUser->section_id ?? '' }}" data-role="{{ $managedUser->role }}">
-                        <div class="account-cell" data-label="User">
+                    <div class="account-row" data-user-id="{{ $managedUser->id }}" data-section-id="{{ $managedUser->section_id ?? '' }}" data-role="{{ $managedUser->role }}" data-nickname="{{ $managedUser->nickname ?? '' }}">
+                        <div class="account-cell user-cell" data-label="User">
                             <p class="account-name">{{ $managedUser->first_name }} {{ $managedUser->last_name }}</p>
+                            <p class="account-position nickname-display">Nickname: {{ $managedUser->nickname ?: '—' }}</p>
                             <p class="account-position">{{ $managedUser->position ?: 'No position set' }}</p>
                         </div>
                         <div class="account-cell" data-label="Credentials">

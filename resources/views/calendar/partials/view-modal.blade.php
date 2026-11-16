@@ -238,9 +238,9 @@ function escapeHtml(str) {
    OPEN ADD MODAL
 ========================================================= */
 function openAddModal(type) {
-    const map = { event: "eventModal", holiday: "holidayModal", leave: "leaveModal", offsite: "offsiteModal", official_business: "offsiteModal" };
+    const map = { event: "eventModal", holiday: "holidayModal", leave: "leaveModal", official_business: "officialBusinessModal" };
     const modalId = map[type];
-    const titles = { eventModal: "Add Activity", holidayModal: "Add Holiday", leaveModal: "Add Leave", offsiteModal: "Add Off Site" };
+    const titles = { eventModal: "Add Activity", holidayModal: "Add Holiday", leaveModal: "Add Leave", officialBusinessModal: "Add Official Business" };
     const form = document.querySelector(`#${modalId} form`);
     const typeSelect = form?.querySelector("[data-create-event-type]");
     if (form) {
@@ -266,10 +266,8 @@ function openAddModal(type) {
     const titleEl = document.getElementById(modalId + "Title");
     if (titleEl) titleEl.textContent = type === "official_business" ? "Add Official Business" : titles[modalId];
     const submitButton = document.querySelector(`#${modalId} .calendar-modal-submit-btn`);
-    if (submitButton && modalId === "offsiteModal") {
-        submitButton.textContent = type === "official_business"
-            ? "Save Official Business"
-            : "Save Off Site";
+    if (submitButton && modalId === "officialBusinessModal") {
+        submitButton.textContent = "Save Official Business";
     }
     openModal(modalId);
 }
@@ -353,7 +351,7 @@ function applyViewModalLayout(type) {
     };
     Object.values(rows).forEach(row => { if (row) row.style.display = "none"; });
     type = (type || "").toLowerCase();
-    const layout = { event: ["link", "location", "notes"], holiday: ["notes"], leave: ["leaveType", "focal", "notes"], offsite: ["location", "focal", "notes"], official_business: ["location", "focal", "notes"] };
+    const layout = { event: ["link", "location", "notes"], holiday: ["notes"], leave: ["leaveType", "focal", "notes"], official_business: ["location", "focal", "notes"] };
     (layout[type] || []).forEach(key => { if (rows[key]) rows[key].style.display = key === "notes" ? "block" : "flex"; });
 }
 
@@ -423,8 +421,7 @@ document.getElementById("editEventBtn").addEventListener("click", async function
         // Which modal to open?
         const map = {
             event: "eventModal",
-            offsite: "offsiteModal",
-            official_business: "offsiteModal",
+            official_business: "officialBusinessModal",
             leave: "leaveModal",
             holiday: "holidayModal"
         };
@@ -434,7 +431,7 @@ document.getElementById("editEventBtn").addEventListener("click", async function
             eventModal: "Edit Activity",
             holidayModal: "Edit Holiday",
             leaveModal: "Edit Leave",
-            offsiteModal: type === "official_business" ? "Edit Official Business" : "Edit Off Site"
+            officialBusinessModal: "Edit Official Business"
         };
         const titleEl = document.getElementById(modalId + "Title");
         if (titleEl) titleEl.textContent = titles[modalId];
@@ -472,8 +469,11 @@ document.getElementById("editEventBtn").addEventListener("click", async function
             if (el) el.value = value ?? "";
         };
         
-        setVal("title", event.title);
+        setVal("title", event.subject || event.title);
         setVal("type", event.type);
+        setVal("activity_type", event.activity_type);
+        setVal("activity_type_other", event.activity_type_other);
+        form.querySelector("[data-activity-type]")?.dispatchEvent(new Event("change"));
         setVal("leave_type", event.leave_type);
         setVal("leave_type_other", event.leave_type_other);
         form.querySelector("[data-leave-type]")?.dispatchEvent(new Event("change"));

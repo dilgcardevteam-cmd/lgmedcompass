@@ -26,9 +26,18 @@ class Event extends Model
         'Others, specify',
     ];
 
+    public const ACTIVITY_TYPES = [
+        'Meeting',
+        'Training',
+        'Orientation',
+        'Others, specify',
+    ];
+
     protected $fillable = [
         'title',
         'type',
+        'activity_type',
+        'activity_type_other',
         'leave_type',
         'leave_type_other',
         'link',
@@ -148,6 +157,36 @@ class Event extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function getCalendarTypeAttribute(): string
+    {
+        return $this->type === 'offsite' ? 'official_business' : $this->type;
+    }
+
+    public function getCalendarTitleAttribute(): string
+    {
+        if ($this->type === 'event') {
+            $activityType = $this->activity_type === 'Others, specify'
+                ? $this->activity_type_other
+                : $this->activity_type;
+
+            if (filled($activityType)) {
+                return "{$activityType}: {$this->title}";
+            }
+        }
+
+        if ($this->type === 'leave') {
+            if ($this->leave_type === 'Others, specify' && filled($this->leave_type_other)) {
+                return $this->leave_type_other;
+            }
+
+            if (filled($this->leave_type)) {
+                return $this->leave_type;
+            }
+        }
+
+        return $this->title;
+    }
+
     public function getCalendarColorAttribute()
     {
         // Special types override everything
@@ -155,11 +194,7 @@ class Event extends Model
             return '#d32f2f';
         }
 
-        if ($this->type === 'offsite') {
-            return '#5c6bc0';
-        }
-
-        if ($this->type === 'official_business') {
+        if ($this->calendar_type === 'official_business') {
             return '#0f766e';
         }
 

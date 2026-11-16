@@ -206,6 +206,13 @@
     border: 1px solid #d1d5db;
     background: white;
 }
+.edit-nickname-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background: white;
+}
 
 /* Action buttons */
 .action-buttons-wrapper {

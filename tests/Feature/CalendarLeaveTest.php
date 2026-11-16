@@ -19,7 +19,6 @@ function createCalendarLeaveTestUser(Section $section, string $firstName, string
 function calendarLeaveData(array $focalPersonIds, string $leaveType = 'Vacation Leave', ?string $other = null): array
 {
     return [
-        'title' => 'Annual Leave Request',
         'type' => 'leave',
         'visibility_type' => 'global',
         'leave_type' => $leaveType,
@@ -54,14 +53,21 @@ test('leave can be created with a leave type and multiple focal persons', functi
     $event = Event::query()->firstOrFail();
 
     expect($event->leave_type)->toBe('Vacation Leave')
+        ->and($event->title)->toBe('Vacation Leave')
         ->and($event->leave_type_other)->toBeNull()
         ->and($event->focalPersonIds())->toBe([$firstFocalPerson->id, $secondFocalPerson->id]);
 
     $this->actingAs($creator)
         ->getJson("/calendar/events/{$event->id}")
         ->assertOk()
+        ->assertJsonPath('title', 'Vacation Leave')
         ->assertJsonPath('leave_type', 'Vacation Leave')
         ->assertJsonPath('focal_person_names', ['Taylor First', 'Jordan Second']);
+
+    $this->actingAs($creator)
+        ->getJson('/calendar/events')
+        ->assertOk()
+        ->assertJsonPath('0.title', 'Vacation Leave');
 });
 
 test('other leave type requires a specification', function () {
@@ -106,6 +112,7 @@ test('leave focal persons and type can be updated', function () {
     $updatedEvent = $event->fresh();
 
     expect($updatedEvent->leave_type)->toBe('Others, specify')
+        ->and($updatedEvent->title)->toBe('Family care leave')
         ->and($updatedEvent->leave_type_other)->toBe('Family care leave')
         ->and($updatedEvent->focalPersonIds())->toBe([$firstFocalPerson->id, $secondFocalPerson->id]);
 });

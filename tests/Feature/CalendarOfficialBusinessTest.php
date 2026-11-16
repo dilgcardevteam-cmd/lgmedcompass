@@ -51,6 +51,11 @@ test('official business can be assigned to multiple focal persons', function () 
         ->assertJsonPath('focal_person', 'Taylor First, Jordan Second')
         ->assertJsonPath('focal_person_names', ['Taylor First', 'Jordan Second'])
         ->assertJsonPath('focal_person_ids', [$firstFocalPerson->id, $secondFocalPerson->id]);
+
+    $this->actingAs($creator)
+        ->getJson('/calendar/events')
+        ->assertOk()
+        ->assertJsonPath('0.personnel', ['Casey Creator', 'Taylor First', 'Jordan Second']);
 });
 
 test('official business focal persons can be updated', function () {
@@ -90,4 +95,46 @@ test('official business requires at least one focal person', function () {
         ->postJson('/calendar/events', officialBusinessData([]))
         ->assertUnprocessable()
         ->assertJsonValidationErrors('focal_person_ids');
+});
+
+test('off site is no longer an event type', function () {
+    $section = Section::create(['name' => 'Planning']);
+    $creator = createCalendarUser($section, 'Casey', 'Creator');
+    $focalPerson = createCalendarUser($section, 'Taylor', 'Focal');
+
+    $this->actingAs($creator)
+        ->postJson('/calendar/events', [
+            ...officialBusinessData([$focalPerson->id]),
+            'type' => 'offsite',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('type');
+});
+
+test('legacy off site events are displayed and saved as official business', function () {
+    $section = Section::create(['name' => 'Planning']);
+    $creator = createCalendarUser($section, 'Casey', 'Creator');
+    $focalPerson = createCalendarUser($section, 'Taylor', 'Focal');
+    $event = Event::create([
+        'title' => 'Regional Planning Meeting',
+        'type' => 'offsite',
+        'location' => 'Main Office',
+        'start_date' => '2026-10-28 08:00:00',
+        'end_date' => '2026-10-28 17:00:00',
+        'focal_person_id' => $focalPerson->id,
+        'section_id' => $section->id,
+        'visibility_type' => 'section',
+        'user_id' => $creator->id,
+    ]);
+
+    $this->actingAs($creator)
+        ->getJson("/calendar/events/{$event->id}")
+        ->assertOk()
+        ->assertJsonPath('type', 'official_business');
+
+    $this->actingAs($creator)
+        ->putJson("/calendar/events/{$event->id}", officialBusinessData([$focalPerson->id]))
+        ->assertOk();
+
+    expect($event->fresh()->type)->toBe('official_business');
 });

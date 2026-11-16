@@ -86,6 +86,14 @@
                     @enderror
                 </div>
 
+                <div class="form-group @error('nickname') input-error @enderror" id="nicknameGroup">
+                    <label for="nickname">Nickname <span class="text-gray-500">(optional)</span></label>
+                    <input id="nickname" type="text" name="nickname" value="{{ old('nickname') }}" maxlength="255" placeholder="Enter Nickname">
+                    @error('nickname')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <!-- Username -->
                 <div class="form-group @error('username') input-error @enderror" id="usernameGroup">
                     <label for="username">Username</label>
@@ -362,6 +370,7 @@ function runAllValidations() {
 
     markFieldGroup('firstNameGroup', firstNameOk);
     markFieldGroup('lastNameGroup', lastNameOk);
+    markFieldGroup('nicknameGroup', true);
     markFieldGroup('usernameGroup', usernameOk);
     markFieldGroup('emailGroup', emailOk);
     markFieldGroup('sectionGroup', sectionOk);
