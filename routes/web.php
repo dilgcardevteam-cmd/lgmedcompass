@@ -8,8 +8,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentWorkflowController;
 use App\Http\Controllers\DriveController;
+use App\Http\Controllers\LgmedReportController;
 use App\Http\Controllers\PpaProjectController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicLgmedReportController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\ServiceRequestController;
 use Illuminate\Support\Facades\File;
@@ -25,6 +27,8 @@ Route::get('/', fn () => view('welcome'))->name('welcome');
 Route::get('/organization', fn () => view('organization'))->name('organization');
 Route::get('/reports-landing', fn () => view('reports-landing'))->name('reports.landing');
 Route::get('/request', [ServiceRequestController::class, 'index'])->name('request.index');
+Route::get('/public/lgmed-reports', [PublicLgmedReportController::class, 'index'])->name('public.lgmed-reports.index');
+Route::get('/public/lgmed-reports/{lgmedReport}', [PublicLgmedReportController::class, 'show'])->name('public.lgmed-reports.show');
 Route::post('/request', [ServiceRequestController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('request.store');
@@ -90,6 +94,10 @@ Route::middleware(['auth', 'verified', 'approved', 'tech_inspector.readonly'])->
             Route::get('/', [PpaProjectController::class, 'index'])->name('index');
         });
     });
+
+    Route::resource('lgmed-reports', LgmedReportController::class)
+        ->except(['create', 'edit'])
+        ->parameters(['lgmed-reports' => 'lgmedReport']);
 
     /*
     |--------------------------------------------------------------------------

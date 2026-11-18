@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Models\CalendarEvent;
 use App\Models\Document;
 use App\Models\DocumentProcess;
+use App\Models\LgmedReport;
 use App\Models\User;
 use App\Policies\CalendarEventPolicy;
 use App\Policies\DocumentPolicy;
 use App\Policies\DocumentProcessPolicy;
+use App\Policies\LgmedReportPolicy;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Gate;
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Document::class, DocumentPolicy::class);
         Gate::policy(CalendarEvent::class, CalendarEventPolicy::class);
         Gate::policy(DocumentProcess::class, DocumentProcessPolicy::class);
+        Gate::policy(LgmedReport::class, LgmedReportPolicy::class);
         Gate::define('manage-accounts', function (User $user): bool {
             return $user->role !== 'Employee';
         });

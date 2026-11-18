@@ -641,6 +641,9 @@
             <a class="item {{ request()->routeIs('ppa.*') ? 'active' : '' }}" href="{{ route('ppa.index') }}" data-title="PPAs">
                 <i class="uil uil-chart-growth"></i><span>PPAs</span>
             </a>
+            <a class="item {{ request()->routeIs('lgmed-reports.*') ? 'active' : '' }}" href="{{ route('lgmed-reports.index') }}" data-title="1ClickMe">
+                <i class="uil uil-clipboard-notes"></i><span>1ClickMe</span>
+            </a>
             <a class="item {{ request()->routeIs('calendar.*') ? 'active' : '' }}" href="{{ route('calendar.index') }}" data-title="Calendar">
                 <i class="uil uil-calendar-alt"></i><span>Calendar</span>
             </a>

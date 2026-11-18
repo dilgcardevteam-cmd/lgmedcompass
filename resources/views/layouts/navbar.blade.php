@@ -73,6 +73,7 @@
                 <div class="services-dropdown-panel">
                     <a href="{{ route('reports.landing') }}">PPAs</a>
                     <a href="{{ route('request.index') }}">Request</a>
+                    <a href="{{ route('public.lgmed-reports.index') }}">1ClickMe</a>
                     <div class="services-dropdown-divider"></div>
                     <details class="services-resources-dropdown">
                         <summary>
@@ -122,6 +123,7 @@
         <div class="services-dropdown-mobile-panel">
             <a href="{{ route('reports.landing') }}" class="text-base font-semibold text-white">PPAs</a>
             <a href="{{ route('request.index') }}" class="text-base font-semibold text-white">Request</a>
+            <a href="{{ route('public.lgmed-reports.index') }}" class="text-base font-semibold text-white">1ClickMe</a>
             <details class="services-resources-dropdown-mobile">
                 <summary>
                     Resources

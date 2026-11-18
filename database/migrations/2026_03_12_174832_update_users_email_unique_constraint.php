@@ -9,6 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return;
+        }
+
         if ($this->indexExists('users', 'users_email_unique')) {
             Schema::table('users', function (Blueprint $table): void {
                 $table->dropUnique('users_email_unique');
@@ -30,6 +34,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return;
+        }
+
         if ($this->indexExists('users', 'users_active_email_unique')) {
             Schema::table('users', function (Blueprint $table): void {
                 $table->dropUnique('users_active_email_unique');
